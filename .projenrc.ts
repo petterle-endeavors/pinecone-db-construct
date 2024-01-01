@@ -8,7 +8,7 @@ const project = new typescript.TypeScriptProject({
   description: 'A CDK construct for Pinecone Indexes',
   projenrcTs: true,
   license: 'MIT',
-  copyrightOwner: 'Jacob Petterle',
+  copyrightOwner: 'Jacob Petterl',
   deps: [
     'projen@^0.75',
     'pnpm@^8.0',
