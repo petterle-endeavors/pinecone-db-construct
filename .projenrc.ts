@@ -1,11 +1,27 @@
 import { typescript } from 'projen';
+import { NodePackageManager } from 'projen/lib/javascript';
+
+
 const project = new typescript.TypeScriptProject({
   defaultReleaseBranch: 'main',
-  name: 'typescript-template',
+  name: 'pinecone-db-construct',
+  description: 'A CDK construct for Pinecone Indexes',
   projenrcTs: true,
-  // deps: [],                /* Runtime dependencies of this module. */
-  // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
-  // devDeps: [],             /* Build dependencies for this module. */
-  // packageName: undefined,  /* The "name" in package.json. */
+  license: 'MIT',
+  copyrightOwner: 'Jacob Petterle',
+  deps: [
+    'projen@^0.75',
+    'pnpm@^8.0',
+    'jsii@^5.0',
+    'jsii-config@^1.0',
+  ],
+  packageManager: NodePackageManager.PNPM,
 });
+
+project.addScripts({
+  preinstall: 'npx only-allow pnpm',
+});
+
+project.gitignore.exclude('.pnpm-store/');
+
 project.synth();
