@@ -1,0 +1,161 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+	"name": "Node.js & TypeScript",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
+	"features": {
+		"ghcr.io/devcontainers/features/aws-cli:1": {
+			"version": "latest"
+		},
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"configureZshAsDefaultShell": true,
+			"installOhMyZsh": true,
+			"installOhMyZshConfig": true,
+			"upgradePackages": true,
+			"username": "vscode",
+			"userUid": "automatic",
+			"userGid": "automatic"
+		},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+			"moby": true,
+			"installDockerBuildx": true,
+			"version": "latest",
+			"dockerDashComposeVersion": "v2"
+		},
+		"ghcr.io/devcontainers/features/git:1": {
+			"ppa": true,
+			"version": "os-provided"
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {
+			"installDirectlyFromGitHubRelease": true,
+			"version": "latest"
+		}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+    "postCreateCommand": "npm install -g projen aws-cdk",
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"fabiospampinato.vscode-highlight",
+				"streetsidesoftware.code-spell-checker",
+				"ms-azuretools.vscode-docker",
+				"mhutchie.git-graph",
+				"GitHub.copilot",
+				"VisualStudioExptTeam.vscodeintellicode",
+				"ms-vsliveshare.vsliveshare",
+				"esbenp.prettier-vscode",
+				"GitHub.vscode-pull-request-github",
+				"searKing.preview-vscode",
+				"MatthewNespor.vscode-color-identifiers-mode"
+			],
+			"settings": {
+				"highlight.regexes": {
+					"((?:<!-- *)?(?:#|// @|//|./\\*+|<!--|--|\\* @|{!|{{!--|{{!) *TODO(?:\\s*\\([^)]+\\))?:?)((?!\\w)(?: *-->| *\\*/| *!}| *--}}| *}}|(?= *(?:[^:]//|/\\*+|<!--|@|--|{!|{{!--|{{!))|(?: +[^\\n@]*?)(?= *(?:[^:]//|/\\*+|<!--|@|--(?!>)|{!|{{!--|{{!))|(?: +[^@\\n]+)?))": {
+						"filterFileRegex": ".*(?<!CHANGELOG.md)$",
+						"decorations": [
+							{
+								"overviewRulerColor": "#ffcc00",
+								"backgroundColor": "#ffcc00",
+								"color": "#1f1f1f",
+								"fontWeight": "bold"
+							},
+							{
+								"backgroundColor": "#ffcc00",
+								"color": "#1f1f1f"
+							}
+						]
+					},
+					"((?:<!-- *)?(?:#|// @|//|./\\*+|<!--|--|\\* @|{!|{{!--|{{!) *(?:FIXME|FIX|BUG|UGLY|DEBUG|HACK)(?:\\s*\\([^)]+\\))?:?)((?!\\w)(?: *-->| *\\*/| *!}| *--}}| *}}|(?= *(?:[^:]//|/\\*+|<!--|@|--|{!|{{!--|{{!))|(?: +[^\\n@]*?)(?= *(?:[^:]//|/\\*+|<!--|@|--(?!>)|{!|{{!--|{{!))|(?: +[^@\\n]+)?))": {
+						"filterFileRegex": ".*(?<!CHANGELOG.md)$",
+						"decorations": [
+							{
+								"overviewRulerColor": "#cc0000",
+								"backgroundColor": "#cc0000",
+								"color": "#1f1f1f",
+								"fontWeight": "bold"
+							},
+							{
+								"backgroundColor": "#cc0000",
+								"color": "#1f1f1f"
+							}
+						]
+					},
+					"((?:<!-- *)?(?:#|// @|//|./\\*+|<!--|--|\\* @|{!|{{!--|{{!) *(?:REVIEW|OPTIMIZE|TSC)(?:\\s*\\([^)]+\\))?:?)((?!\\w)(?: *-->| *\\*/| *!}| *--}}| *}}|(?= *(?:[^:]//|/\\*+|<!--|@|--|{!|{{!--|{{!))|(?: +[^\\n@]*?)(?= *(?:[^:]//|/\\*+|<!--|@|--(?!>)|{!|{{!--|{{!))|(?: +[^@\\n]+)?))": {
+						"filterFileRegex": ".*(?<!CHANGELOG.md)$",
+						"decorations": [
+							{
+								"overviewRulerColor": "#00ccff",
+								"backgroundColor": "#00ccff",
+								"color": "#1f1f1f",
+								"fontWeight": "bold"
+							},
+							{
+								"backgroundColor": "#00ccff",
+								"color": "#1f1f1f"
+							}
+						]
+					},
+					"((?:<!-- *)?(?:#|// @|//|./\\*+|<!--|--|\\* @|{!|{{!--|{{!) *(?:IDEA)(?:\\s*\\([^)]+\\))?:?)((?!\\w)(?: *-->| *\\*/| *!}| *--}}| *}}|(?= *(?:[^:]//|/\\*+|<!--|@|--|{!|{{!--|{{!))|(?: +[^\\n@]*?)(?= *(?:[^:]//|/\\*+|<!--|@|--(?!>)|{!|{{!--|{{!))|(?: +[^@\\n]+)?))": {
+						"filterFileRegex": ".*(?<!CHANGELOG.md)$",
+						"decorations": [
+							{
+								"overviewRulerColor": "#cc00cc",
+								"backgroundColor": "#cc00cc",
+								"color": "#1f1f1f",
+								"fontWeight": "bold"
+							},
+							{
+								"backgroundColor": "#cc00cc",
+								"color": "#1f1f1f"
+							}
+						]
+					},
+					"((?:<!-- *)?(?:#|// @|//|./\\*+|<!--|--|\\* @|{!|{{!--|{{!) *(?:COMPLETE)(?:\\s*\\([^)]+\\))?:?)((?!\\w)(?: *-->| *\\*/| *!}| *--}}| *}}|(?= *(?:[^:]//|/\\*+|<!--|@|--|{!|{{!--|{{!))|(?: +[^\\n@]*?)(?= *(?:[^:]//|/\\*+|<!--|@|--(?!>)|{!|{{!--|{{!))|(?: +[^@\\n]+)?))": {
+						"filterFileRegex": ".*(?<!CHANGELOG.md)$",
+						"decorations": [
+							{
+								"overviewRulerColor": "#00CC5F",
+								"backgroundColor": "#00CC44",
+								"color": "#1f1f1f",
+								"fontWeight": "bold"
+							},
+							{
+								"backgroundColor": "#00CC3D",
+								"color": "#1f1f1f"
+							}
+						]
+					},
+					"(\\w+)(=)": [
+						{
+							"color": "#D19A66"
+						}
+					]
+				},
+				"git.enableSmartCommit": true,
+				"git.confirmSync": false,
+				"git.autofetch": true,
+				"github.copilot.enable": {
+					"*": true,
+					"plaintext": true,
+					"markdown": false,
+					"scminput": false,
+					"yaml": true
+				},
+				"git.pruneOnFetch": true,
+				"files.autoSaveDelay": 500,
+				"editor.formatOnSave": true,
+				"files.autoSave": "afterDelay",
+				"terminal.integrated.defaultProfile.linux": "zsh",
+			}
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
