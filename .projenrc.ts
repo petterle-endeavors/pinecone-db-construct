@@ -1,27 +1,46 @@
-import { typescript } from 'projen';
+import { AwsCdkConstructLibrary } from 'projen/lib/awscdk';
 import { NodePackageManager } from 'projen/lib/javascript';
 
 
-const project = new typescript.TypeScriptProject({
-  defaultReleaseBranch: 'main',
+const library = new AwsCdkConstructLibrary({
+  author: 'Jacob Petterle',
   name: 'pinecone-db-construct',
   description: 'A CDK construct for Pinecone Indexes',
+  cdkVersion: '2.118.0',
+  repositoryUrl: 'https://github.com/petterle-endeavors/pinecone-db-construct',
+  authorAddress: 'jacobpetterle@gmail.com',
+  defaultReleaseBranch: 'main',
+  packageManager: NodePackageManager.PNPM,
   projenrcTs: true,
-  license: 'MIT',
-  copyrightOwner: 'Jacob Petterle',
-  deps: [
+  publishToPypi: {
+    distName: 'pinecone-db-construct',
+    module: 'pinecone_db_construct',
+  },
+  publishToMaven: {
+    javaPackage: 'com.github.petterleendeavors.pineconedbconstruct',
+    mavenGroupId: 'com.github.petterleendeavors',
+    mavenArtifactId: 'pinecone-db-construct',
+  },
+  publishToNuget: {
+    dotNetNamespace: 'PetterleEndeavors.PineconeDbConstruct',
+    packageId: 'PineconeDbConstruct',
+  },
+  publishToGo: {
+    gitUserName: 'petterle-endeavors',
+    gitUserEmail: 'jacobpetterle@gmail.com',
+    moduleName: 'github.com/petterle-endeavors/pinecone-db-construct',
+  },
+  devDeps: [
     'projen@^0.75',
     'pnpm@^8.0',
-    'jsii@^5.0',
-    'jsii-config@^1.0',
   ],
-  packageManager: NodePackageManager.PNPM,
 });
 
-project.addScripts({
+// force using pnpm
+library.addScripts({
   preinstall: 'npx only-allow pnpm',
 });
 
-project.gitignore.exclude('.pnpm-store/');
+library.gitignore.exclude('.pnpm-store/');
 
-project.synth();
+library.synth();
