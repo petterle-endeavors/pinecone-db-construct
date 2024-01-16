@@ -8,6 +8,14 @@ overrides:
   '@types/babel__traverse': 7.18.2
   '@types/prettier': 2.6.0
 
+dependencies:
+  '@aws-cdk/aws-lambda-python-alpha':
+    specifier: ^2.100.0-alpha.0
+    version: 2.100.0-alpha.0(aws-cdk-lib@2.118.0)(constructs@10.0.5)
+  aws-cdk-lib:
+    specifier: ^2.0
+    version: 2.118.0(constructs@10.0.5)
+
 devDependencies:
   '@types/jest':
     specifier: ^27
@@ -21,9 +29,6 @@ devDependencies:
   '@typescript-eslint/parser':
     specifier: ^6
     version: 6.18.0(eslint@8.56.0)(typescript@5.3.3)
-  aws-cdk-lib:
-    specifier: 2.118.0
-    version: 2.118.0(constructs@10.0.5)
   constructs:
     specifier: 10.0.5
     version: 10.0.5
@@ -93,15 +98,26 @@ packages:
 
   /@aws-cdk/asset-awscli-v1@2.2.201:
     resolution: {integrity: sha512-INZqcwDinNaIdb5CtW3ez5s943nX5stGBQS6VOP2JDlOFP81hM3fds/9NDknipqfUkZM43dx+HgVvkXYXXARCQ==}
-    dev: true
+    dev: false
 
   /@aws-cdk/asset-kubectl-v20@2.1.2:
     resolution: {integrity: sha512-3M2tELJOxQv0apCIiuKQ4pAbncz9GuLwnKFqxifWfe77wuMxyTRPmxssYHs42ePqzap1LT6GDcPygGs+hHstLg==}
-    dev: true
+    dev: false
 
   /@aws-cdk/asset-node-proxy-agent-v6@2.0.1:
     resolution: {integrity: sha512-DDt4SLdLOwWCjGtltH4VCST7hpOI5DzieuhGZsBpZ+AgJdSI2GCjklCXm0GCTwJG/SolkL5dtQXyUKgg9luBDg==}
-    dev: true
+    dev: false
+
+  /@aws-cdk/aws-lambda-python-alpha@2.100.0-alpha.0(aws-cdk-lib@2.118.0)(constructs@10.0.5):
+    resolution: {integrity: sha512-1QjaPf8DWdbd8jLGlcE3QOWVMs2y83coAt48cmUFGIky0QpiKClvuKZU76wVmQ5fK6b9+rbDfSgBhu16d1HuZA==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      aws-cdk-lib: ^2.100.0
+      constructs: ^10.0.0
+    dependencies:
+      aws-cdk-lib: 2.118.0(constructs@10.0.5)
+      constructs: 10.0.5
+    dev: false
 
   /@babel/code-frame@7.23.5:
     resolution: {integrity: sha512-CgH3s1a96LipHCmSUmYFPwY7MNx8C3avkq7i4Wl3cfa662ldtUe4VM1TPXX70pfmrlWTb6jLqTYrZyT2ZTJBgA==}
@@ -1322,7 +1338,7 @@ packages:
       '@aws-cdk/asset-kubectl-v20': 2.1.2
       '@aws-cdk/asset-node-proxy-agent-v6': 2.0.1
       constructs: 10.0.5
-    dev: true
+    dev: false
     bundledDependencies:
       - '@balena/dockerignore'
       - case
@@ -1649,7 +1665,6 @@ packages:
   /constructs@10.0.5:
     resolution: {integrity: sha512-IwOwekzrASFC3qt4ozCtV09rteAIAesuCGsW0p+uBfqHd2XcvA5CXqJjgf4eUqm6g8e/noXlVCMDWwC8GaLtrg==}
     engines: {node: '>= 10.17.0'}
-    dev: true
     bundledDependencies: []
 
   /conventional-changelog-angular@5.0.13:

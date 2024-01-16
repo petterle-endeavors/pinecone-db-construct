@@ -16,20 +16,24 @@ const library = new AwsCdkConstructLibrary({
     distName: 'pinecone-db-construct',
     module: 'pinecone_db_construct',
   },
-  publishToMaven: {
-    javaPackage: 'com.github.petterleendeavors.pineconedbconstruct',
-    mavenGroupId: 'com.github.petterleendeavors',
-    mavenArtifactId: 'pinecone-db-construct',
-  },
-  publishToNuget: {
-    dotNetNamespace: 'PetterleEndeavors.PineconeDbConstruct',
-    packageId: 'PineconeDbConstruct',
-  },
-  publishToGo: {
-    gitUserName: 'petterle-endeavors',
-    gitUserEmail: 'jacobpetterle@gmail.com',
-    moduleName: 'github.com/petterle-endeavors/pinecone-db-construct',
-  },
+  // publishToMaven: {
+  //   javaPackage: 'com.github.petterleendeavors.pineconedbconstruct',
+  //   mavenGroupId: 'com.github.petterleendeavors',
+  //   mavenArtifactId: 'pinecone-db-construct',
+  // },
+  // publishToNuget: {
+  //   dotNetNamespace: 'PetterleEndeavors.PineconeDbConstruct',
+  //   packageId: 'PineconeDbConstruct',
+  // },
+  // publishToGo: {
+  //   gitUserName: 'petterle-endeavors',
+  //   gitUserEmail: 'jacobpetterle@gmail.com',
+  //   moduleName: 'github.com/petterle-endeavors/pinecone-db-construct',
+  // },
+  deps: [
+    'aws-cdk-lib@^2.0',
+    '@aws-cdk/aws-lambda-python-alpha@^2.100.0-alpha.0',
+  ],
   devDeps: [
     'projen@^0.75',
     'pnpm@^8.0',
