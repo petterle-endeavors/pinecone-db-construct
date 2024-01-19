@@ -29,7 +29,8 @@
     "upgrade": "npx projen upgrade",
     "watch": "npx projen watch",
     "projen": "npx projen",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "cdk-deploy": "pnpm compile && cdk deploy --app \"lib/examples/app.js\" --require-approval never"
   },
   "author": {
     "name": "Jacob Petterle",
@@ -41,7 +42,7 @@
     "@types/node": "^16",
     "@typescript-eslint/eslint-plugin": "^6",
     "@typescript-eslint/parser": "^6",
-    "aws-cdk-lib": "^2.118",
+    "aws-cdk-lib": "^2.118.0",
     "eslint": "^8",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.0",
@@ -65,8 +66,8 @@
   },
   "dependencies": {
     "@aws-cdk/aws-lambda-python-alpha": "^2.100.0-alpha.0",
-    "aws-cdk-lib": "^2.118",
-    "constructs": "^10.0",
+    "aws-cdk-lib": "^2.118.0",
+    "constructs": "^10.0.5",
     "js-md5": "^0.8"
   },
   "bundledDependencies": [

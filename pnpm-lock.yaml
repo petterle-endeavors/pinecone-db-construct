@@ -13,10 +13,10 @@ dependencies:
     specifier: ^2.100.0-alpha.0
     version: 2.100.0-alpha.0(aws-cdk-lib@2.118.0)(constructs@10.0.5)
   aws-cdk-lib:
-    specifier: ^2.118
+    specifier: ^2.118.0
     version: 2.118.0(constructs@10.0.5)
   constructs:
-    specifier: ^10.0
+    specifier: ^10.0.5
     version: 10.0.5
   js-md5:
     specifier: ^0.8
@@ -1668,7 +1668,6 @@ packages:
   /constructs@10.0.5:
     resolution: {integrity: sha512-IwOwekzrASFC3qt4ozCtV09rteAIAesuCGsW0p+uBfqHd2XcvA5CXqJjgf4eUqm6g8e/noXlVCMDWwC8GaLtrg==}
     engines: {node: '>= 10.17.0'}
-    bundledDependencies: []
 
   /conventional-changelog-angular@5.0.13:
     resolution: {integrity: sha512-i/gipMxs7s8L/QeuavPF2hLnJgH6pEZAttySB6aiQLWcX3puWDL3ACVmvBhJGxnAy52Qc15ua26BufY6KpmrVA==}
