@@ -1,4 +1,4 @@
-import { App, Stack, StackProps } from 'aws-cdk-lib';
+import { App, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { PineconeIndex, PineConeEnvironment } from '../index';
 
@@ -14,8 +14,8 @@ class MyStack extends Stack {
         indexSettings: [{
           apiKeySecretName: 'pinecone-test',
           environment: PineConeEnvironment.GCP_STARTER,
-          name: 'test-index',
           dimension: 128,
+          removalPolicy: RemovalPolicy.DESTROY,
         }],
         customResourceSettings: {
           numAttemptsToRetryOperation: 3,
