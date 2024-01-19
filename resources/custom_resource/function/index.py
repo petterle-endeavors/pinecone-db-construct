@@ -55,7 +55,7 @@ def delete(event: Dict[str, Any], context: LambdaContext) -> Union[bool, str, No
     resource_id = event.get("PhysicalResourceId")
     assert (
         index.name == resource_id
-    ), f"PhysicalResourceId '{resource_id}' does not match index name '{index.name}'"
+    ), f"Cannot change index name: PhysicalResourceId '{resource_id}' does not match index name '{index.name}'"
     LOGGER.info("Deleting Pinecone index '%s'", index.name)
     index.delete()
 
