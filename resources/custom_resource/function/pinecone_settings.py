@@ -40,10 +40,10 @@ class DistanceMetric(str, Enum):
 class RemovalPolicy(str, Enum):
     """Define the removal policies."""
 
-    DESTROY = "DESTROY"
-    RETAIN = "RETAIN"
-    RETAIN_ON_UPDATE_OR_DELETE = "RETAIN_ON_UPDATE_OR_DELETE"
-    SNAPSHOT = "SNAPSHOT"
+    DESTROY = "destroy"
+    RETAIN = "retain"
+    RETAIN_ON_UPDATE = "retain-on-update-or-delete"
+    SNAPSHOT = "snapshot"
 
 
 class PineConeEnvironment(str, Enum):
@@ -70,11 +70,18 @@ class PineConeEnvironment(str, Enum):
 MAX_INDEX_NAME_LENGTH = 45
 
 
+def to_camel_case(snake_str: str) -> str:
+    """Convert snake case to camel case."""
+    components = snake_str.split("_")
+    return components[0] + "".join(x.title() for x in components[1:])
+
+
 class PineconeIndexSettings(BaseModel):
     """Define the settings for the Pinecone index."""
 
     model_config = ConfigDict(
-        use_enum_values=True,
+        alias_generator=to_camel_case,
+        populate_by_name=True,
     )
 
     api_key_secret_name: str = Field(
