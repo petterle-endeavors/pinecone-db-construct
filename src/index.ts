@@ -7,6 +7,7 @@ import {
   Size,
   CfnOutput,
   RemovalPolicy,
+  Stack,
   aws_secretsmanager as secretsManager,
   custom_resources as customResources,
   aws_lambda as lambda,
@@ -85,8 +86,8 @@ export interface MetaDataConfig {
 export interface PineconeIndexSettings {
   readonly apiKeySecretName: string;
   readonly environment: PineConeEnvironment;
-  readonly name: string;
   readonly dimension: number;
+  readonly name?: string;
   readonly removalPolicy?: RemovalPolicy;
   readonly metric?: DistanceMetric;
   readonly pods?: number;
@@ -97,7 +98,7 @@ export interface PineconeIndexSettings {
   readonly sourceCollection?: string;
 };
 
-const DEFAULT_PINECONE_INDEX_SETTINGS: Omit<PineconeIndexSettings, 'apiKeySecretName' | 'environment' | 'name' | 'dimension'> = {
+const DEFAULT_PINECONE_INDEX_SETTINGS: Omit<PineconeIndexSettings, 'apiKeySecretName' | 'environment' | 'dimension'> = {
   removalPolicy: RemovalPolicy.RETAIN,
   metric: DistanceMetric.DOT_PRODUCT,
   pods: 1,
@@ -114,6 +115,7 @@ export interface PineconeIndexProps {
 
 
 export class PineconeIndex extends Construct {
+  private stackName: string;
 
   constructor(
     scope: Construct,
@@ -121,6 +123,7 @@ export class PineconeIndex extends Construct {
     props: PineconeIndexProps,
   ) {
     super(scope, id);
+    this.stackName = Stack.of(this).stackName;
     let { indexSettings, customResourceSettings = {} } = props;
     indexSettings = indexSettings.map(indexSetting => {
       indexSetting = {
@@ -134,8 +137,6 @@ export class PineconeIndex extends Construct {
       ...DEFAULT_CUSTOM_RESOURCE_SETTINGS,
       ...customResourceSettings,
     };
-    customResourceSettings = this.convertCamelToEnvVarName(customResourceSettings);
-    customResourceSettings = this.serializeEnv(customResourceSettings);
     const lambdaConfig: LambdaConfig = {
       constructId: `${id}Lambda`,
       description: 'Custom resource provider for configuring Pinecone indexes.',
@@ -163,11 +164,13 @@ export class PineconeIndex extends Construct {
       onEventHandler: lambdaFunc,
     });
 
-    indexSettings.forEach(indexSetting => {
+    indexSettings.forEach((indexSetting, index) => {
       const properties = this.serializeEnv(indexSetting);
-      properties.name = this.getIndexName(provider.serviceToken, indexSetting.name);
+      if (indexSetting.name === undefined) {
+        properties.name = this.getIndexName(provider.serviceToken, `index${index}`);
+      }
       properties.customResourceDirHash = this.getHashForAllFilesInDir(CUSTOM_RESOURCE_DIRECTORY);
-
+      console.log(properties);
       const apiKeySecret = secretsManager.Secret.fromSecretNameV2(this, 'PineconeApiKey', indexSetting.apiKeySecretName);
       apiKeySecret.grantRead(lambdaFunc);
 
@@ -177,7 +180,7 @@ export class PineconeIndex extends Construct {
       });
 
       new CfnOutput(this, `${indexSetting.name}IndexName`, {
-        value: indexSetting.name,
+        value: properties.name,
         description: `Name of the '${indexSetting.name}' Pinecone index.`,
       });
     });
@@ -199,6 +202,8 @@ export class PineconeIndex extends Construct {
     } = config;
 
     // Create the Lambda function with the provided configuration.
+    const dumpedEnv = this.dumpToEnv(environment);
+    console.log(dumpedEnv);
     const lambda_func = new python_lambda.PythonFunction(
       this,
       `${constructId}`,
@@ -218,7 +223,7 @@ export class PineconeIndex extends Construct {
             PIP_ONLY_BINARY: ':all:',
           },
         },
-        environment: this.serializeEnv(environment),
+        environment: dumpedEnv,
         memorySize: memorySize.toMebibytes(),
         ephemeralStorageSize: ephemeralStorageSize,
         timeout: timeout,
@@ -234,9 +239,17 @@ export class PineconeIndex extends Construct {
   }
 
   private getIndexName(serviceToken: string, indexName: string): string {
-    const prefix = md5(serviceToken).substring(0, 20);
-    const name = `${prefix}-${indexName}`;
+    const suffixLength = 20;
+    const prefixLength = 15;
+    const prefix = this.stackName.substring(0, prefixLength).toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+    const suffix = md5(serviceToken).substring(0, suffixLength);
+    const indexNameLength = MAX_INDEX_NAME_LENGTH - prefixLength - suffixLength;
+    const name = `${prefix}-${indexName.substring(0, indexNameLength)}-${suffix}`;
     return name.substring(0, MAX_INDEX_NAME_LENGTH);
+  }
+
+  private dumpToEnv(env: { [key: string]: any }): { [key: string]: string } {
+    return this.serializeEnv(this.convertCamelToEnvVarName(env));
   }
 
   private serializeEnv(env: { [key: string]: any }): { [key: string]: string } {
@@ -244,7 +257,7 @@ export class PineconeIndex extends Construct {
     for (let key in env) {
       if (typeof env[key] === 'string') {
         serializedEnv[key] = env[key];
-      } else if (typeof env[key] === 'object' && env[key] !== null) {
+      } else if (env[key] !== null) {
         serializedEnv[key] = JSON.stringify(env[key]);
       }
     }
