@@ -215,9 +215,9 @@ const pineconeIndexSettings: PineconeIndexSettings = { ... }
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.apiKeySecretName">apiKeySecretName</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.dimension">dimension</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.environment">environment</a></code> | <code><a href="#pinecone-db-construct.PineConeEnvironment">PineConeEnvironment</a></code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.name">name</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.metadataConfig">metadataConfig</a></code> | <code><a href="#pinecone-db-construct.MetaDataConfig">MetaDataConfig</a></code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.metric">metric</a></code> | <code><a href="#pinecone-db-construct.DistanceMetric">DistanceMetric</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.name">name</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.podInstanceType">podInstanceType</a></code> | <code><a href="#pinecone-db-construct.PodType">PodType</a></code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.pods">pods</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.podSize">podSize</a></code> | <code><a href="#pinecone-db-construct.PodSize">PodSize</a></code> | *No description.* |
@@ -257,16 +257,6 @@ public readonly environment: PineConeEnvironment;
 
 ---
 
-##### `name`<sup>Required</sup> <a name="name" id="pinecone-db-construct.PineconeIndexSettings.property.name"></a>
-
-```typescript
-public readonly name: string;
-```
-
-- *Type:* string
-
----
-
 ##### `metadataConfig`<sup>Optional</sup> <a name="metadataConfig" id="pinecone-db-construct.PineconeIndexSettings.property.metadataConfig"></a>
 
 ```typescript
@@ -284,6 +274,16 @@ public readonly metric: DistanceMetric;
 ```
 
 - *Type:* <a href="#pinecone-db-construct.DistanceMetric">DistanceMetric</a>
+
+---
+
+##### `name`<sup>Optional</sup> <a name="name" id="pinecone-db-construct.PineconeIndexSettings.property.name"></a>
+
+```typescript
+public readonly name: string;
+```
+
+- *Type:* string
 
 ---
 
