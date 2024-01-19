@@ -49,7 +49,8 @@ const library = new AwsCdkConstructLibrary({
 
 // force using pnpm
 library.addScripts({
-  preinstall: 'npx only-allow pnpm',
+  'preinstall': 'npx only-allow pnpm',
+  'cdk-deploy': 'pnpm compile && cdk deploy --app "lib/examples/app.js" --require-approval never',
 });
 
 library.gitignore.exclude('.pnpm-store/');
