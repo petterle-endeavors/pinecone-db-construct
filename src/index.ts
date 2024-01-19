@@ -1,94 +1,186 @@
-import { Construct } from 'constructs';
-const customResourceDir = require("../resources/custom_resource"); // eslint-disable-line @typescript-eslint/no-require-imports
-import * as cdk from "aws-cdk-lib";
-import { Construct, CustomResource, Duration, Size, CfnOutput } from "@aws-cdk";
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as iam from "@aws-cdk/aws-iam";
-import * as secretsmanager from "@aws-cdk/aws-secretsmanager";
-import * as path from "path";
-import * as custom_resources from "@aws-cdk/custom-resources";
-import * as fs from "fs";
+import * as fs from 'fs';
+import * as path from 'path';
 import * as python_lambda from '@aws-cdk/aws-lambda-python-alpha';
+import {
+  CustomResource,
+  Duration,
+  Size,
+  CfnOutput,
+  RemovalPolicy,
+  aws_secretsmanager as secretsManager,
+  custom_resources as customResources,
+  aws_lambda as lambda,
+} from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { md5 } from 'js-md5';
+// const customResourceDir = require('../resources/custom_resource'); // eslint-disable-line @typescript-eslint/no-require-imports
 
-export interface PineconeIndexSettings {
-  // Define your settings interface with the properties you need.
-  name: string;
-  apiSecretName: string;
+const CUSTOM_RESOURCE_DIRECTORY = path.join(__dirname, '../resources/custom_resource');
+
+
+export interface CustomResourceSettings {
+  readonly numAttemptsToRetryOperation?: number;
 }
 
-interface LambdaConfig {
+const DEFAULT_CUSTOM_RESOURCE_SETTINGS: CustomResourceSettings = {};
+
+type LambdaConfig = {
   constructId: string;
   description: string;
   entry: string;
   index?: string;
   handler?: string;
-  environment?: { [key: string]: string };
-  memorySize?: cdk.Size;
-  timeout?: cdk.Duration;
-  ephemeralStorageSize?: cdk.Size,
+  environment?: CustomResourceSettings;
+  memorySize?: Size;
+  timeout?: Duration;
+  ephemeralStorageSize?: Size;
 }
 
+// Enums converted to TypeScript
+export enum PodType {
+  S1 = 's1',
+  P1 = 'p1',
+  P2 = 'p2',
+}
+
+export enum PodSize {
+  X1 = 'x1',
+  X2 = 'x2',
+  X4 = 'x4',
+  X8 = 'x8',
+}
+
+export enum DistanceMetric {
+  EUCLIDEAN = 'euclidean',
+  COSINE = 'cosine',
+  DOT_PRODUCT = 'dotproduct',
+}
+
+export enum PineConeEnvironment {
+  GCP_STARTER = 'gcp-starter',
+  GCP_FREE_US_WEST_1 = 'us-west1-gcp-free',
+  GCP_FREE_ASIA_SOUTHEAST_1 = 'asia-southeast1-gcp-free',
+  GCP_FREE_US_WEST_4 = 'us-west4-gcp-free',
+  GCP_STD_US_WEST_1 = 'us-west1-gcp',
+  GCP_STD_US_CENTRAL_1 = 'us-central1-gcp',
+  GCP_STD_US_WEST_4 = 'us-west4-gcp',
+  GCP_STD_US_EAST_4 = 'us-east4-gcp',
+  GCP_STD_NORTH_AMERICA_NORTHEAST_1 = 'northamerica-northeast1-gcp',
+  GCP_STD_ASIA_NORTHEAST_1 = 'asia-northeast1-gcp',
+  GCP_STD_ASIA_SOUTHEAST_1 = 'asia-southeast1-gcp',
+  GCP_STD_US_EAST_1 = 'us-east1-gcp',
+  GCP_STD_EU_WEST_1 = 'eu-west1-gcp',
+  GCP_STD_EU_WEST_4 = 'eu-west4-gcp',
+  AWS_STD_US_EAST_1 = 'us-east-1-aws',
+  AZURE_STD_EAST_US = 'eastus-azure',
+}
+
+const MAX_INDEX_NAME_LENGTH = 45;
+
+// Type converted from MetaDataConfig TypedDict
+export interface MetaDataConfig {
+  readonly indexed: string[];
+};
+
+export interface PineconeIndexSettings {
+  readonly apiKeySecretName: string;
+  readonly environment: PineConeEnvironment;
+  readonly name: string;
+  readonly dimension: number;
+  readonly removalPolicy?: RemovalPolicy;
+  readonly metric?: DistanceMetric;
+  readonly pods?: number;
+  readonly replicas?: number;
+  readonly podInstanceType?: PodType;
+  readonly podSize?: PodSize;
+  readonly metadataConfig?: MetaDataConfig;
+  readonly sourceCollection?: string;
+};
+
+const DEFAULT_PINECONE_INDEX_SETTINGS: Omit<PineconeIndexSettings, 'apiKeySecretName' | 'environment' | 'name' | 'dimension'> = {
+  removalPolicy: RemovalPolicy.RETAIN,
+  metric: DistanceMetric.DOT_PRODUCT,
+  pods: 1,
+  replicas: 1,
+  podInstanceType: PodType.S1,
+  podSize: PodSize.X1,
+  sourceCollection: '',
+};
+
+export interface PineconeIndexProps {
+  readonly indexSettings: PineconeIndexSettings[];
+  readonly customResourceSettings?: CustomResourceSettings;
+}
+
+
 export class PineconeIndex extends Construct {
-  private indexSettings: PineconeIndexSettings[];
 
   constructor(
     scope: Construct,
     id: string,
-    indexSettings: PineconeIndexSettings | PineconeIndexSettings[],
-    indexDirectory: string
+    props: PineconeIndexProps,
   ) {
     super(scope, id);
-    this.indexSettings = Array.isArray(indexSettings)
-      ? indexSettings
-      : [indexSettings];
+    let { indexSettings, customResourceSettings = {} } = props;
+    indexSettings = indexSettings.map(indexSetting => {
+      indexSetting = {
+        ...DEFAULT_PINECONE_INDEX_SETTINGS,
+        ...indexSetting,
+      };
+      return indexSetting;
+    });
 
-    // The path to your Lambda directory within your project.
+    customResourceSettings = {
+      ...DEFAULT_CUSTOM_RESOURCE_SETTINGS,
+      ...customResourceSettings,
+    };
+    customResourceSettings = this.convertCamelToEnvVarName(customResourceSettings);
+    customResourceSettings = this.serializeEnv(customResourceSettings);
     const lambdaConfig: LambdaConfig = {
       constructId: `${id}Lambda`,
-      description: "Custom resource provider for configuring Pinecone indexes.",
-      indexDirectory: indexDirectory, // Set the directory path where the lambda code exists.
-      // Additional LambdaConfig properties can be set here.
+      description: 'Custom resource provider for configuring Pinecone indexes.',
+      entry: CUSTOM_RESOURCE_DIRECTORY, // Set the directory path where the lambda code exists.
+      environment: customResourceSettings,
     };
 
-    const customResourceProvider: Provider =
-      this.createCustomResource(lambdaConfig);
+    this.createCustomResource(lambdaConfig, indexSettings);
+  }
 
-    // Additional logic for setting up the CustomResource, similar to the for-loop in Python.
+  private convertCamelToEnvVarName(object: { [key: string]: any }): { [key: string]: string } {
+    let converted: { [key: string]: string } = {};
+    for (let key in object) {
+      converted[key.replace(/([A-Z])/g, '_$1').toUpperCase()] = object[key];
+    }
+    return converted;
   }
 
   private createCustomResource(
-    lambda_config: LambdaConfig,
-    index_settings: PineconeIndexSettings
-  ): custom_resources.Provider {}
-    const lambda_func = this.createLambdaFunction(lambda_config);
-    const provider = new Provider(this, `${lambda_config.constructId}Provider`, {
-      onEventHandler: lambda_func,
+    lambdaConfig: LambdaConfig,
+    indexSettings: PineconeIndexSettings[],
+  ): customResources.Provider {
+    const lambdaFunc = this.createLambdaFunction(lambdaConfig);
+    const provider = new customResources.Provider(this, `${lambdaConfig.constructId}Provider`, {
+      onEventHandler: lambdaFunc,
     });
-//     for index_settings in self._index_settings:
-//     index_settings.name = self.get_index_name(provider, index_settings)
-//     properties = self.serialize_env(index_settings)
-//     # we are adding these properties so that cloudformation will
-//     # update the custom resource when either the settings have changed
-//     # or the custom resource directory has changed, i.e. the lambda
-//     # function code has changed
-//     properties["custom_resource_dir_hash"] = self.get_hash_for_all_files_in_dir(_CUSTOM_RESOURCE_DIRECTORY)
-//     api_key_secret = Secret.from_secret_name_v2(self, "PineconeApiKey", index_settings.api_key_secret_name)
-//     api_key_secret.grant_read(function)
-//     CustomResource(
-//         self,
-//         id=f"{func_config.construct_id}CustomResource",
-//         service_token=provider.service_token,
-//         properties=properties,
-//     )
-//     CfnOutput(
-//         self,
-//         f"{index_settings.name}IndexName",
-//         value=index_settings.name,
-//         description=f"Name of the '{index_settings.name}' Pinecone index.",
-//     )
-// return provider
-    // translate to typescript
-    
+
+    indexSettings.forEach(indexSetting => {
+      const properties = this.serializeEnv(indexSetting);
+      properties.name = this.getIndexName(provider.serviceToken, indexSetting.name);
+      properties.customResourceDirHash = this.getHashForAllFilesInDir(CUSTOM_RESOURCE_DIRECTORY);
+
+      const apiKeySecret = secretsManager.Secret.fromSecretNameV2(this, 'PineconeApiKey', indexSetting.apiKeySecretName);
+      apiKeySecret.grantRead(lambdaFunc);
+
+      new CustomResource(this, `${lambdaConfig.constructId}CustomResource`, {
+        serviceToken: provider.serviceToken,
+        properties: properties,
+      });
+
+      new CfnOutput(this, `${indexSetting.name}IndexName`, {
+        value: indexSetting.name,
+        description: `Name of the '${indexSetting.name}' Pinecone index.`,
+      });
+    });
 
     return provider;
   }
@@ -101,11 +193,11 @@ export class PineconeIndex extends Construct {
       index = 'function/index.py',
       handler = 'lambda_handler',
       environment = {},
-      memorySize = cdk.Size.mebibytes(256),
-      timeout = cdk.Duration.seconds(60),
-      ephemeralStorageSize = cdk.Size.mebibytes(512),
+      memorySize = Size.mebibytes(256),
+      timeout = Duration.seconds(60),
+      ephemeralStorageSize = Size.mebibytes(512),
     } = config;
-  
+
     // Create the Lambda function with the provided configuration.
     const lambda_func = new python_lambda.PythonFunction(
       this,
@@ -126,14 +218,14 @@ export class PineconeIndex extends Construct {
             PIP_ONLY_BINARY: ':all:',
           },
         },
-        environment: environment,
+        environment: this.serializeEnv(environment),
         memorySize: memorySize.toMebibytes(),
         ephemeralStorageSize: ephemeralStorageSize,
         timeout: timeout,
       },
     );
 
-    new cdk.CfnOutput(this, `${config.constructId}LambdaArn`, {
+    new CfnOutput(this, `${config.constructId}LambdaArn`, {
       value: lambda_func.functionArn,
       description: `ARN for the ${config.constructId} Lambda function.`,
     });
@@ -141,15 +233,18 @@ export class PineconeIndex extends Construct {
     return lambda_func;
   }
 
-  // ... additional methods for serializeEnv, getHashForAllFilesInDir, etc.
+  private getIndexName(serviceToken: string, indexName: string): string {
+    const prefix = md5(serviceToken).substring(0, 20);
+    const name = `${prefix}-${indexName}`;
+    return name.substring(0, MAX_INDEX_NAME_LENGTH);
+  }
 
   private serializeEnv(env: { [key: string]: any }): { [key: string]: string } {
     let serializedEnv: { [key: string]: string } = {};
     for (let key in env) {
-      if (typeof env[key] === "string") {
+      if (typeof env[key] === 'string') {
         serializedEnv[key] = env[key];
-      } else {
-        // Use JSON.stringify to serialize non-string values.
+      } else if (typeof env[key] === 'object' && env[key] !== null) {
         serializedEnv[key] = JSON.stringify(env[key]);
       }
     }
@@ -157,18 +252,19 @@ export class PineconeIndex extends Construct {
   }
 
   private getHashForAllFilesInDir(directory: string): string {
-    let hash = crypto.createHash("md5");
-
     const files = fs.readdirSync(directory);
+    let fileData = '';
     for (let file of files) {
-      // Read files recursively if needed and update the hash.
       const filePath = path.join(directory, file);
-      const fileData = fs.readFileSync(filePath);
-      hash.update(fileData);
+      if (fs.lstatSync(filePath).isDirectory()) {
+        fileData += this.getHashForAllFilesInDir(filePath);
+      } else {
+        fileData += fs.readFileSync(filePath, 'utf8');
+      }
     }
-
-    return hash.digest("hex");
+    let hash = md5.create();
+    hash.update(fileData);
+    return hash.hex();
   }
 
-  // ... other methods and logic to finish the construct.
 }

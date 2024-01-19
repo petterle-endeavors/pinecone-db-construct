@@ -13,8 +13,14 @@ dependencies:
     specifier: ^2.100.0-alpha.0
     version: 2.100.0-alpha.0(aws-cdk-lib@2.118.0)(constructs@10.0.5)
   aws-cdk-lib:
-    specifier: ^2.0
+    specifier: ^2.118
     version: 2.118.0(constructs@10.0.5)
+  constructs:
+    specifier: ^10.0
+    version: 10.0.5
+  js-md5:
+    specifier: ^0.8
+    version: 0.8.3
 
 devDependencies:
   '@types/jest':
@@ -29,9 +35,6 @@ devDependencies:
   '@typescript-eslint/parser':
     specifier: ^6
     version: 6.18.0(eslint@8.56.0)(typescript@5.3.3)
-  constructs:
-    specifier: 10.0.5
-    version: 10.0.5
   eslint:
     specifier: ^8
     version: 8.56.0
@@ -3636,6 +3639,10 @@ packages:
       - ts-node
       - utf-8-validate
     dev: true
+
+  /js-md5@0.8.3:
+    resolution: {integrity: sha512-qR0HB5uP6wCuRMrWPTrkMaev7MJZwJuuw4fnwAzRgP4J4/F8RwtodOKpGp4XpqsLBFzzgqIO42efFAyz2Et6KQ==}
+    dev: false
 
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
