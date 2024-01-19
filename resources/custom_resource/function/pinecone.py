@@ -44,6 +44,11 @@ class PineconeIndex:
         """Pod type is in the format s1.x1, so we need to split and get the first prefix (Example: s1)."""
         return f"{index_settings.pod_instance_type}.{index_settings.pod_size}"
 
+    @property
+    def settings(self) -> PineconeIndexSettings:
+        """Return the settings for the index."""
+        return self._index_settings
+
     def create(self) -> None:
         """Create a pinecone index."""
         settings = self._index_settings
@@ -90,7 +95,7 @@ class PineconeIndex:
                 LOGGER.error(error)
                 LOGGER.info("Attempt %s of %s failed.", attempt + 1, num_attempts)
                 if attempt + 1 == num_attempts:
-                    raise RuntimeError(f"Failed to run operation: {operation.__name__}") from error
+                    raise RuntimeError(f"Failed to run operation: {operation.__name__}: {error}") from error
                 LOGGER.info("Retrying in %s seconds...", delay_between_attempts)
                 time.sleep(delay_between_attempts)
 
@@ -128,6 +133,7 @@ class PineconeIndex:
     def _validate_update_operation(self) -> None:
         index_settings = self._index_settings
         pod_type = pinecone.describe_index(index_settings.name).pod_type
+        LOGGER.info("Current pod type: '%s'", pod_type)
         current_pod_instance_type, current_pod_size = pod_type.split(".")
         new_pod_size = index_settings.pod_size
         assert (
