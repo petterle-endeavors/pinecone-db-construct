@@ -1,6 +1,6 @@
+import { JsonPatch } from 'projen';
 import { AwsCdkConstructLibrary } from 'projen/lib/awscdk';
 import { NodePackageManager } from 'projen/lib/javascript';
-import { JsonPatch } from 'projen';
 
 
 const PACKAGE_NAME = 'pinecone-db-construct';
@@ -81,6 +81,6 @@ releaseWorkflow?.patch(
       },
     },
   ),
-)
+);
 
 library.synth();
