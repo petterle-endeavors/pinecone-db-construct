@@ -40,7 +40,7 @@ const library = new AwsCdkConstructLibrary({
     'aws-cdk-lib@^2.118.0',
     'constructs@^10.0.5',
     'projen@^0.75',
-    'pnpm@^8.0',
+    'pnpm@^7.0',
   ],
   bundledDeps: [
     'js-md5@^0.8',
