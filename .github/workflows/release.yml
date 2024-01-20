@@ -155,6 +155,5 @@ jobs:
         with:
           packages-dir: dist/python
     environment:
-      environment:
-        name: pypi
-        url: https://pypi.org/p/pinecone-db-construct
+      name: pypi
+      url: https://pypi.org/p/pinecone-db-construct
