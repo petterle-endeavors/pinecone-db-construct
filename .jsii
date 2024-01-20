@@ -139,6 +139,19 @@
             }
           }
         },
+        "aws-cdk-lib.amzn_sdc": {
+          "targets": {
+            "dotnet": {
+              "package": "Amazon.CDK.AMZN.SDC"
+            },
+            "java": {
+              "package": "amzn.sdc"
+            },
+            "python": {
+              "module": "aws_cdk.amzn_sdc"
+            }
+          }
+        },
         "aws-cdk-lib.assertions": {
           "targets": {
             "dotnet": {
@@ -867,6 +880,19 @@
             },
             "python": {
               "module": "aws_cdk.aws_codestarnotifications"
+            }
+          }
+        },
+        "aws-cdk-lib.aws_codetest": {
+          "targets": {
+            "dotnet": {
+              "package": "Amazon.CDK.AWS.CodeTest"
+            },
+            "java": {
+              "package": "software.amazon.awscdk.services.codetest"
+            },
+            "python": {
+              "module": "aws_cdk.aws_codetest"
             }
           }
         },
@@ -3671,7 +3697,7 @@
     "stability": "stable"
   },
   "homepage": "https://github.com/petterle-endeavors/pinecone-db-construct",
-  "jsiiVersion": "1.93.0 (build 1706ca5)",
+  "jsiiVersion": "1.94.0 (build b380f01)",
   "keywords": [
     "cdk"
   ],
@@ -4298,5 +4324,5 @@
     }
   },
   "version": "0.0.0",
-  "fingerprint": "mSQJXhPzjXaU3uvJnM8T0O3rpfiIQ2iDYD1DhpeMH0A="
+  "fingerprint": "WpkxnaFbiPbByl1+hprgLiEqaTqOG+QwB56yj2+tpBk="
 }
