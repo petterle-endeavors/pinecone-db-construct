@@ -21,11 +21,6 @@
       "type": "build"
     },
     {
-      "name": "aws-cdk-lib",
-      "version": "^2.118.0",
-      "type": "build"
-    },
-    {
       "name": "eslint-import-resolver-typescript",
       "type": "build"
     },
@@ -71,11 +66,6 @@
       "type": "build"
     },
     {
-      "name": "pnpm",
-      "version": "^7.0",
-      "type": "build"
-    },
-    {
       "name": "projen",
       "type": "build"
     },
@@ -96,11 +86,6 @@
     {
       "name": "typescript",
       "type": "build"
-    },
-    {
-      "name": "js-md5",
-      "version": "^0.8",
-      "type": "bundled"
     },
     {
       "name": "@types/babel__traverse",

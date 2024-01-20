@@ -21,7 +21,7 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
-    "postCreateCommand": "npm install -g aws-cdk pnpm ts-node projen && pnpm add projen && projen",
+    "postCreateCommand": "npm install -g aws-cdk pnpm@^7.0 ts-node projen && pnpm add projen && projen",
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
