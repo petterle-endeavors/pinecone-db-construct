@@ -62,10 +62,8 @@ releaseWorkflow?.patch(
   JsonPatch.add(
     '/jobs/release_pypi/environment',
     {
-      environment: {
-        name: 'pypi',
-        url: `https://pypi.org/p/${PACKAGE_NAME}`,
-      },
+      name: 'pypi',
+      url: `https://pypi.org/p/${PACKAGE_NAME}`,
     },
   ),
   JsonPatch.remove(
