@@ -1,10 +1,13 @@
+import { JsonPatch } from 'projen';
 import { AwsCdkConstructLibrary } from 'projen/lib/awscdk';
 import { NodePackageManager } from 'projen/lib/javascript';
 
 
+const PACKAGE_NAME = 'pinecone-db-construct';
+
 const library = new AwsCdkConstructLibrary({
   author: 'Jacob Petterle',
-  name: 'pinecone-db-construct',
+  name: PACKAGE_NAME,
   description: 'A CDK construct for Pinecone Indexes',
   cdkVersion: '2.118.0',
   repositoryUrl: 'https://github.com/petterle-endeavors/pinecone-db-construct',
@@ -49,5 +52,35 @@ library.addScripts({
 });
 
 library.gitignore.exclude('.pnpm-store/');
+
+const releaseWorkflow = library.tryFindObjectFile('.github/workflows/release.yml');
+releaseWorkflow?.patch(
+  JsonPatch.add(
+    '/jobs/release_pypi/permissions/id-token',
+    'write',
+  ),
+  JsonPatch.add(
+    '/jobs/release_pypi/environment',
+    {
+      environment: {
+        name: 'pypi',
+        url: `https://pypi.org/p/${PACKAGE_NAME}`,
+      },
+    },
+  ),
+  JsonPatch.remove(
+    '/jobs/release_pypi/steps/-1',
+  ),
+  JsonPatch.add(
+    '/jobs/release_pypi/steps/-',
+    {
+      name: 'Publish Package to PyPI',
+      uses: 'pypa/gh-action-pypi-publish@release/v1',
+      with: {
+        'packages-dir': 'dist/python',
+      },
+    },
+  ),
+);
 
 library.synth();
