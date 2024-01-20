@@ -31,13 +31,14 @@ const library = new AwsCdkConstructLibrary({
   //   moduleName: 'github.com/petterle-endeavors/pinecone-db-construct',
   // },
   deps: [
-    'aws-cdk-lib@^2.118.0',
     '@aws-cdk/aws-lambda-python-alpha@^2.100.0-alpha.0',
-    'constructs@^10.0.5',
     'js-md5@^0.8',
   ],
   devDeps: [
     'projen@^0.75',
+  ],
+  bundledDeps: [
+    'js-md5@^0.8',
   ],
 });
 
