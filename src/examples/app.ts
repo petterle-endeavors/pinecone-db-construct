@@ -14,7 +14,7 @@ class MyStack extends Stack {
           apiKeySecretName: 'pinecone-test',
           environment: PineConeEnvironment.GCP_STARTER,
           dimension: 128,
-          removalPolicy: RemovalPolicy.SNAPSHOT,
+          removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
         }],
         deploymentSettings: {
           numAttemptsToRetryOperation: 2,

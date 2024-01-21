@@ -36,7 +36,8 @@
 				"esbenp.prettier-vscode",
 				"GitHub.vscode-pull-request-github",
 				"searKing.preview-vscode",
-				"MatthewNespor.vscode-color-identifiers-mode"
+				"MatthewNespor.vscode-color-identifiers-mode",
+				"github.vscode-github-actions"
 			],
 			"settings": {
 				"highlight.regexes": {

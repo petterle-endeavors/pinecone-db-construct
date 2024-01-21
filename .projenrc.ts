@@ -53,7 +53,10 @@ library.addScripts({
   'cdk-deploy': 'pnpm compile && cdk deploy --app "lib/examples/app.js" --require-approval never',
 });
 
-library.gitignore.exclude('.pnpm-store/');
+library.gitignore.exclude(
+  '.pnpm-store/',
+  '**/cdk.out',
+);
 
 const releaseWorkflow = library.tryFindObjectFile('.github/workflows/release.yml');
 releaseWorkflow?.patch(
