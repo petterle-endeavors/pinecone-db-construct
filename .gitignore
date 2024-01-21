@@ -51,4 +51,5 @@ junit.xml
 tsconfig.json
 !/API.md
 .pnpm-store/
+**/cdk.out
 !/.projenrc.ts
