@@ -18,7 +18,6 @@ class MyStack extends Stack {
         }],
         deploymentSettings: {
           numAttemptsToRetryOperation: 2,
-          deploymentArchitecture: 
         },
       },
     );
