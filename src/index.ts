@@ -15,7 +15,6 @@ import {
 import { Construct } from 'constructs';
 import { md5 } from 'js-md5';
 
-
 const CUSTOM_RESOURCE_DIRECTORY = path.join(__dirname, '../resources/custom_resource');
 
 
@@ -88,8 +87,7 @@ export interface MetaDataConfig {
 };
 
 export interface PineconeIndexSettings {
-  readonly apiKeySecretName?: string;
-  readonly apiKey?: string;
+  readonly apiKeySecretName: string;
   readonly environment: PineConeEnvironment;
   readonly dimension: number;
   readonly name?: string;
@@ -177,8 +175,7 @@ export class PineconeIndex extends Construct {
         properties.name = this.getIndexName(provider.serviceToken, `index${index}`);
       }
       properties.customResourceDirHash = this.getHashForAllFilesInDir(CUSTOM_RESOURCE_DIRECTORY);
-      const apiKeySecret = this.getApiKeySecretName(indexSetting.apiKeySecretName, indexSetting.apiKey);
-      properties.apiKeySecretName = apiKeySecret.secretName;
+      const apiKeySecret = secretsManager.Secret.fromSecretNameV2(this, 'PineconeApiKey', indexSetting.apiKeySecretName);
       apiKeySecret.grantRead(lambdaFunc);
 
       new CustomResource(this, `${lambdaConfig.constructId}CustomResource`, {
@@ -195,28 +192,6 @@ export class PineconeIndex extends Construct {
     return provider;
   }
 
-  private getApiKeySecretName(apiKeySecretName?: string, apiKey?: string): secretsManager.ISecret {
-    if (apiKeySecretName && apiKey) {
-      throw new Error('Only one of apiKeySecretName or apiKey can be provided.');
-    }
-    if (apiKeySecretName) {
-      return secretsManager.Secret.fromSecretNameV2(this, 'PineconeApiKey', apiKeySecretName);
-    } else if (apiKey) {
-      return new secretsManager.Secret(
-        this,
-        'PineconeApiKey',
-        {
-          secretName: 'PineconeApiKey',
-          generateSecretString: {
-            secretStringTemplate: JSON.stringify({ apiKey: apiKey }),
-            generateStringKey: 'apiKey',
-          },
-        },
-      );
-    }
-    throw new Error('Either apiKeySecretName or apiKey must be provided.');
-  }
-  
   private createLambdaFunction(config: LambdaConfig): python_lambda.PythonFunction {
     const {
       constructId,
