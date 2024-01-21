@@ -1,4 +1,10 @@
-import { App, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import {
+  App,
+  RemovalPolicy,
+  Stack,
+  StackProps,
+  aws_lambda as lambda,
+} from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { PineconeIndex, PineConeEnvironment } from '../index';
 
@@ -6,7 +12,6 @@ class MyStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    // Create an instance of the construct
     new PineconeIndex(
       this,
       'PineconeIndex',
@@ -15,10 +20,11 @@ class MyStack extends Stack {
           apiKeySecretName: 'pinecone-test',
           environment: PineConeEnvironment.GCP_STARTER,
           dimension: 128,
-          removalPolicy: RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.SNAPSHOT,
         }],
-        customResourceSettings: {
-          numAttemptsToRetryOperation: 3,
+        deploymentSettings: {
+          numAttemptsToRetryOperation: 2,
+          deploymentArchitecture: 
         },
       },
     );
@@ -27,4 +33,5 @@ class MyStack extends Stack {
 
 const app = new App();
 new MyStack(app, 'MyStack');
+
 app.synth();
