@@ -137,7 +137,3 @@ If running the default ARM deployment architecture and deploying on an x86_64 ma
 ## Contributing
 
 We welcome contributions, feedback, and bug reports. Before you contribute, please read our [contributing guidelines](CONTRIBUTING.md).
-
-## Reporting Security Vulnerabilities
-
-If you find a security issue, please contact us at [security@example.com](mailto:security@example.com). We take all security bugs seriously. Thank you for improving the security of our project.
