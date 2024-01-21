@@ -42,7 +42,7 @@ class RemovalPolicy(str, Enum):
 
     DESTROY = "destroy"
     RETAIN = "retain"
-    RETAIN_ON_UPDATE = "retain-on-update-or-delete"
+    RETAIN_ON_UPDATE_OR_DELETE = "retain-on-update-or-delete"
     SNAPSHOT = "snapshot"
 
 
