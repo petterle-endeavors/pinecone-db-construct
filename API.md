@@ -103,25 +103,36 @@ The tree node.
 
 ## Structs <a name="Structs" id="Structs"></a>
 
-### CustomResourceSettings <a name="CustomResourceSettings" id="pinecone-db-construct.CustomResourceSettings"></a>
+### DeploymentSettings <a name="DeploymentSettings" id="pinecone-db-construct.DeploymentSettings"></a>
 
-#### Initializer <a name="Initializer" id="pinecone-db-construct.CustomResourceSettings.Initializer"></a>
+#### Initializer <a name="Initializer" id="pinecone-db-construct.DeploymentSettings.Initializer"></a>
 
 ```typescript
-import { CustomResourceSettings } from 'pinecone-db-construct'
+import { DeploymentSettings } from 'pinecone-db-construct'
 
-const customResourceSettings: CustomResourceSettings = { ... }
+const deploymentSettings: DeploymentSettings = { ... }
 ```
 
 #### Properties <a name="Properties" id="Properties"></a>
 
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
-| <code><a href="#pinecone-db-construct.CustomResourceSettings.property.numAttemptsToRetryOperation">numAttemptsToRetryOperation</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#pinecone-db-construct.DeploymentSettings.property.deploymentArchitecture">deploymentArchitecture</a></code> | <code>aws-cdk-lib.aws_lambda.Architecture</code> | *No description.* |
+| <code><a href="#pinecone-db-construct.DeploymentSettings.property.numAttemptsToRetryOperation">numAttemptsToRetryOperation</a></code> | <code>number</code> | *No description.* |
 
 ---
 
-##### `numAttemptsToRetryOperation`<sup>Optional</sup> <a name="numAttemptsToRetryOperation" id="pinecone-db-construct.CustomResourceSettings.property.numAttemptsToRetryOperation"></a>
+##### `deploymentArchitecture`<sup>Optional</sup> <a name="deploymentArchitecture" id="pinecone-db-construct.DeploymentSettings.property.deploymentArchitecture"></a>
+
+```typescript
+public readonly deploymentArchitecture: Architecture;
+```
+
+- *Type:* aws-cdk-lib.aws_lambda.Architecture
+
+---
+
+##### `numAttemptsToRetryOperation`<sup>Optional</sup> <a name="numAttemptsToRetryOperation" id="pinecone-db-construct.DeploymentSettings.property.numAttemptsToRetryOperation"></a>
 
 ```typescript
 public readonly numAttemptsToRetryOperation: number;
@@ -174,7 +185,7 @@ const pineconeIndexProps: PineconeIndexProps = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#pinecone-db-construct.PineconeIndexProps.property.indexSettings">indexSettings</a></code> | <code><a href="#pinecone-db-construct.PineconeIndexSettings">PineconeIndexSettings</a>[]</code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PineconeIndexProps.property.customResourceSettings">customResourceSettings</a></code> | <code><a href="#pinecone-db-construct.CustomResourceSettings">CustomResourceSettings</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PineconeIndexProps.property.deploymentSettings">deploymentSettings</a></code> | <code><a href="#pinecone-db-construct.DeploymentSettings">DeploymentSettings</a></code> | *No description.* |
 
 ---
 
@@ -188,13 +199,13 @@ public readonly indexSettings: PineconeIndexSettings[];
 
 ---
 
-##### `customResourceSettings`<sup>Optional</sup> <a name="customResourceSettings" id="pinecone-db-construct.PineconeIndexProps.property.customResourceSettings"></a>
+##### `deploymentSettings`<sup>Optional</sup> <a name="deploymentSettings" id="pinecone-db-construct.PineconeIndexProps.property.deploymentSettings"></a>
 
 ```typescript
-public readonly customResourceSettings: CustomResourceSettings;
+public readonly deploymentSettings: DeploymentSettings;
 ```
 
-- *Type:* <a href="#pinecone-db-construct.CustomResourceSettings">CustomResourceSettings</a>
+- *Type:* <a href="#pinecone-db-construct.DeploymentSettings">DeploymentSettings</a>
 
 ---
 
