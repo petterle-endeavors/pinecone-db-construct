@@ -6,7 +6,6 @@ class MyStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    // Create an instance of the construct
     new PineconeIndex(
       this,
       'PineconeIndex',
@@ -15,10 +14,10 @@ class MyStack extends Stack {
           apiKeySecretName: 'pinecone-test',
           environment: PineConeEnvironment.GCP_STARTER,
           dimension: 128,
-          removalPolicy: RemovalPolicy.DESTROY,
+          removalPolicy: RemovalPolicy.SNAPSHOT,
         }],
-        customResourceSettings: {
-          numAttemptsToRetryOperation: 3,
+        deploymentSettings: {
+          numAttemptsToRetryOperation: 2,
         },
       },
     );
@@ -27,4 +26,5 @@ class MyStack extends Stack {
 
 const app = new App();
 new MyStack(app, 'MyStack');
+
 app.synth();

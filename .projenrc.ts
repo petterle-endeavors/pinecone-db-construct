@@ -10,10 +10,12 @@ const library = new AwsCdkConstructLibrary({
   name: PACKAGE_NAME,
   description: 'A CDK construct for Pinecone Indexes',
   cdkVersion: '2.118.0',
+  license: 'MIT',
   repositoryUrl: 'https://github.com/petterle-endeavors/pinecone-db-construct',
   authorAddress: 'jacobpetterle@gmail.com',
   defaultReleaseBranch: 'main',
   packageManager: NodePackageManager.PNPM,
+  stability: 'experimental',
   projenrcTs: true,
   publishToPypi: {
     distName: 'pinecone-db-construct',
