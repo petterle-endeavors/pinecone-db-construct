@@ -14,16 +14,19 @@ import {
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { md5 } from 'js-md5';
-// const customResourceDir = require('../resources/custom_resource'); // eslint-disable-line @typescript-eslint/no-require-imports
 
 const CUSTOM_RESOURCE_DIRECTORY = path.join(__dirname, '../resources/custom_resource');
 
 
-export interface CustomResourceSettings {
+export interface DeploymentSettings {
   readonly numAttemptsToRetryOperation?: number;
+  readonly deploymentArchitecture?: lambda.Architecture;
 }
 
-const DEFAULT_CUSTOM_RESOURCE_SETTINGS: CustomResourceSettings = {};
+const DEFAULT_DEPLOYMENT_SETTINGS: DeploymentSettings = {
+  numAttemptsToRetryOperation: 3,
+  deploymentArchitecture: lambda.Architecture.ARM_64,
+};
 
 type LambdaConfig = {
   constructId: string;
@@ -31,7 +34,7 @@ type LambdaConfig = {
   entry: string;
   index?: string;
   handler?: string;
-  environment?: CustomResourceSettings;
+  environment?: DeploymentSettings;
   memorySize?: Size;
   timeout?: Duration;
   ephemeralStorageSize?: Size;
@@ -110,12 +113,13 @@ const DEFAULT_PINECONE_INDEX_SETTINGS: Omit<PineconeIndexSettings, 'apiKeySecret
 
 export interface PineconeIndexProps {
   readonly indexSettings: PineconeIndexSettings[];
-  readonly customResourceSettings?: CustomResourceSettings;
+  readonly deploymentSettings?: DeploymentSettings;
 }
 
 
 export class PineconeIndex extends Construct {
   private stackName: string;
+  private deploymentSettings: DeploymentSettings;
 
   constructor(
     scope: Construct,
@@ -124,7 +128,7 @@ export class PineconeIndex extends Construct {
   ) {
     super(scope, id);
     this.stackName = Stack.of(this).stackName;
-    let { indexSettings, customResourceSettings = {} } = props;
+    let { indexSettings, deploymentSettings = {} } = props;
     indexSettings = indexSettings.map(indexSetting => {
       indexSetting = {
         ...DEFAULT_PINECONE_INDEX_SETTINGS,
@@ -133,15 +137,16 @@ export class PineconeIndex extends Construct {
       return indexSetting;
     });
 
-    customResourceSettings = {
-      ...DEFAULT_CUSTOM_RESOURCE_SETTINGS,
-      ...customResourceSettings,
+    deploymentSettings = {
+      ...DEFAULT_DEPLOYMENT_SETTINGS,
+      ...deploymentSettings,
     };
+    this.deploymentSettings = deploymentSettings;
     const lambdaConfig: LambdaConfig = {
       constructId: `${id}Lambda`,
       description: 'Custom resource provider for configuring Pinecone indexes.',
       entry: CUSTOM_RESOURCE_DIRECTORY, // Set the directory path where the lambda code exists.
-      environment: customResourceSettings,
+      environment: deploymentSettings,
     };
 
     this.createCustomResource(lambdaConfig, indexSettings);
@@ -170,7 +175,6 @@ export class PineconeIndex extends Construct {
         properties.name = this.getIndexName(provider.serviceToken, `index${index}`);
       }
       properties.customResourceDirHash = this.getHashForAllFilesInDir(CUSTOM_RESOURCE_DIRECTORY);
-      console.log(properties);
       const apiKeySecret = secretsManager.Secret.fromSecretNameV2(this, 'PineconeApiKey', indexSetting.apiKeySecretName);
       apiKeySecret.grantRead(lambdaFunc);
 
@@ -203,7 +207,6 @@ export class PineconeIndex extends Construct {
 
     // Create the Lambda function with the provided configuration.
     const dumpedEnv = this.dumpToEnv(environment);
-    console.log(dumpedEnv);
     const lambda_func = new python_lambda.PythonFunction(
       this,
       `${constructId}`,
@@ -213,7 +216,7 @@ export class PineconeIndex extends Construct {
         index: index,
         handler: handler,
         runtime: lambda.Runtime.PYTHON_3_10,
-        architecture: lambda.Architecture.ARM_64,
+        architecture: this.deploymentSettings.deploymentArchitecture,
         bundling: {
           // this is needed because we are running ARM
           // if we were running x86, we would NOT need any bundling
