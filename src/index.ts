@@ -19,12 +19,12 @@ const CUSTOM_RESOURCE_DIRECTORY = path.join(__dirname, '../resources/custom_reso
 
 
 export interface DeploymentSettings {
-  readonly numAttemptsToRetryOperation?: number;
+  readonly maxNumberOfAttempts?: number;
   readonly deploymentArchitecture?: lambda.Architecture;
 }
 
 const DEFAULT_DEPLOYMENT_SETTINGS: DeploymentSettings = {
-  numAttemptsToRetryOperation: 3,
+  maxNumberOfAttempts: 3,
   deploymentArchitecture: lambda.Architecture.X86_64,
 };
 
@@ -206,6 +206,18 @@ export class PineconeIndex extends Construct {
     } = config;
 
     const dumpedEnv = this.dumpToEnv(environment);
+    let bundling = {};
+    if (this.deploymentSettings.deploymentArchitecture === lambda.Architecture.ARM_64) {
+      bundling = {
+        // this is needed because we are running ARM
+        // if we were running x86, we would NOT need any bundling
+        // options as the PythonFunction construct takes care of this for us
+        environment: {
+          PIP_PLATFORM: 'manylinux2014_aarch64',
+          PIP_ONLY_BINARY: ':all:',
+        },
+      };
+    }
     const lambda_func = new python_lambda.PythonFunction(
       this,
       `${constructId}`,
@@ -216,15 +228,7 @@ export class PineconeIndex extends Construct {
         handler: handler,
         runtime: lambda.Runtime.PYTHON_3_10,
         architecture: this.deploymentSettings.deploymentArchitecture,
-        bundling: {
-          // this is needed because we are running ARM
-          // if we were running x86, we would NOT need any bundling
-          // options as the PythonFunction construct takes care of this for us
-          environment: {
-            PIP_PLATFORM: 'manylinux2014_aarch64',
-            PIP_ONLY_BINARY: ':all:',
-          },
-        },
+        bundling: bundling,
         environment: dumpedEnv,
         memorySize: memorySize.toMebibytes(),
         ephemeralStorageSize: ephemeralStorageSize,
