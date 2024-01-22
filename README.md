@@ -55,6 +55,7 @@ class MyStack extends Stack {
           apiKeySecretName: 'pinecone-test',
           dimension: 128,
           removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+          // Pod Index (see python example for serverless)
           podSpec: {
             environment: PineConeEnvironment.GCP_STARTER,
           },
@@ -107,6 +108,7 @@ class MyStack(Stack):
                     api_key_secret_name='pinecone-test',
                     dimension=128,
                     removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+                    # Serverless Index (see typescript example for Pod)
                     pod_spec=ServerlessSpec(
                         cloud_provider=CloudProvider.AWS,
                         region=Region.US_WEST_2,
@@ -126,7 +128,7 @@ APP.synth()
 ```
 
 ## Common Issues
-If running the default ARM deployment architecture and deploying on an x86_64 machine, you may run into the dreaded `exec /bin/sh: exec format error`, if this happens you have two options:
+If running the ARM deployment architecture (configurable through the `deploymentSettings` prop) and deploying ON (not to) an x86_64 machine, you may run into the dreaded `exec /bin/sh: exec format error`, if this happens you have two options:
 1. Switch to x86 architecture (Lame 😒):
   ```
   new PineconeIndex(
@@ -146,7 +148,7 @@ If running the default ARM deployment architecture and deploying on an x86_64 ma
   docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
   ```
 
-**Note:** first time bundling will be slower when running in emulation mode, so keep that in mind (adds about 40 sec for first time deployment). **Most most CICD environments will do this for you (github actions) with do this emulation out of the box for you.**
+**Note:** first time bundling in emulation mode will be slower when running in emulation mode, so keep that in mind (adds about 40 sec for first time deployment). **Most most CICD environments will do this for you (github actions) with do this emulation out of the box for you.**
 
 ## Contributing
 
