@@ -19,12 +19,12 @@ const CUSTOM_RESOURCE_DIRECTORY = path.join(__dirname, '../resources/custom_reso
 
 
 export interface DeploymentSettings {
-  readonly maxNumberOfAttempts?: number;
+  readonly maxNumAttempts?: number;
   readonly deploymentArchitecture?: lambda.Architecture;
 }
 
 const DEFAULT_DEPLOYMENT_SETTINGS: DeploymentSettings = {
-  maxNumberOfAttempts: 3,
+  maxNumAttempts: 3,
   deploymentArchitecture: lambda.Architecture.X86_64,
 };
 
@@ -248,7 +248,8 @@ export class PineconeIndex extends Construct {
     const suffixLength = 20;
     const prefixLength = 15;
     const prefix = this.stackName.substring(0, prefixLength).toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
-    const suffix = md5(serviceToken).substring(0, suffixLength);
+    const serviceTokenPrefix = serviceToken.split('-').slice(0, -1).join('-');
+    const suffix = md5(serviceTokenPrefix).substring(0, suffixLength);
     const indexNameLength = MAX_INDEX_NAME_LENGTH - prefixLength - suffixLength;
     const name = `${prefix}-${indexName.substring(0, indexNameLength)}-${suffix}`;
     return name.substring(0, MAX_INDEX_NAME_LENGTH);

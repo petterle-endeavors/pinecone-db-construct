@@ -20,7 +20,7 @@ class MyStack extends Stack {
           },
         }],
         deploymentSettings: {
-          maxNumberOfAttempts: 2,
+          maxNumAttempts: 2,
         },
       },
     );

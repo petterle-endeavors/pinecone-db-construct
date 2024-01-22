@@ -13,6 +13,6 @@ class Settings(BaseSettings):
     )
 
     max_num_attempts: int = Field(
-        default=5,
+        default=3,
         description="The number of attempts to run an operation.",
     )
