@@ -1,9 +1,24 @@
 """Pinecone index config settings."""
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Union
 from typing_extensions import TypedDict
 from pydantic import Field, BaseModel, ConfigDict
 
+
+
+def to_camel_case(snake_str: str) -> str:
+    """Convert snake case to camel case."""
+    components = snake_str.split("_")
+    return components[0] + "".join(x.title() for x in components[1:])
+
+
+class CamelCaseModel(BaseModel):
+    """Define a model that uses camel case."""
+
+    model_config = ConfigDict(
+        alias_generator=to_camel_case,
+        populate_by_name=True,
+    )
 
 
 class MetaDataConfig(TypedDict):
@@ -12,7 +27,7 @@ class MetaDataConfig(TypedDict):
     indexed: List[str]
 
 
-class PodType(str, Enum):
+class PodInstanceType(str, Enum):
     """Define the pod types."""
 
     S1 = "s1"
@@ -20,7 +35,7 @@ class PodType(str, Enum):
     P2 = "p2"
 
 
-class PodSize(str, Enum):
+class PodInstanceSize(str, Enum):
     """Define the pod sizes."""
 
     X1 = "x1"
@@ -67,34 +82,76 @@ class PineConeEnvironment(str, Enum):
     AZURE_STD_EAST_US = "eastus-azure"
 
 
-MAX_INDEX_NAME_LENGTH = 45
+class CloudProvider(str, Enum):
+    """Define the cloud providers."""
+
+    AWS = "aws"
 
 
-def to_camel_case(snake_str: str) -> str:
-    """Convert snake case to camel case."""
-    components = snake_str.split("_")
-    return components[0] + "".join(x.title() for x in components[1:])
+class Region(str, Enum):
+    """Define the regions."""
+
+    US_WEST_2 = "us-west-2"
 
 
-class PineconeIndexSettings(BaseModel):
-    """Define the settings for the Pinecone index."""
+class PodSpec(CamelCaseModel):
+    """Define the pod spec."""
 
-    model_config = ConfigDict(
-        alias_generator=to_camel_case,
-        populate_by_name=True,
-    )
-
-    api_key_secret_name: str = Field(
-        ...,
-        description="The name of the secret containing the Pinecone API key.",
-    )
     environment: PineConeEnvironment = Field(
         ...,
         description="The environment to use for the Pinecone project.",
     )
-    removal_policy: RemovalPolicy = Field(
-        default=RemovalPolicy.RETAIN,
-        description="The removal policy for the Pinecone indexes.",
+    num_replicas: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description="The number of replicas to use.",
+    )
+    shards: Optional[int] = Field(
+        default=None,
+        ge=1,
+        description="The number of shards to use.",
+    )
+    num_pods: Optional[int] = Field(
+        default=None,
+        ge=1,
+        description="The number of pods to use.",
+    )
+    pod_instance_type: Optional[PodInstanceType] = Field(
+        default=None,
+        description="The type of pod to use.",
+    )
+    pod_instance_size: Optional[PodInstanceSize] = Field(
+        default=None,
+        description="The size of the pod to use.",
+    )
+    metadata_config: MetaDataConfig = Field(
+        default_factory=dict,
+        description="The metadata configuration to use.",
+    )
+
+
+class ServerlessSpec(CamelCaseModel):
+    """Define the serverless spec."""
+
+    cloud_provider: CloudProvider = Field(
+        ...,
+        description="The cloud provider to use.",
+    )
+    region: Region = Field(
+        ...,
+        description="The region to use.",
+    )
+
+
+MAX_INDEX_NAME_LENGTH = 45
+
+
+class PineconeIndexSettings(CamelCaseModel):
+    """Define the settings for the Pinecone index."""
+
+    api_key_secret_name: str = Field(
+        ...,
+        description="The name of the secret containing the Pinecone API key.",
     )
     name: str = Field(
         ...,
@@ -106,35 +163,15 @@ class PineconeIndexSettings(BaseModel):
         ...,
         description="Dimension of vectors stored in the index.",
     )
+    pod_spec: Union[PodSpec, ServerlessSpec] = Field(
+        ...,
+        description="The pod spec to use for the Pinecone index.",
+    )
     metric: DistanceMetric = Field(
         default=DistanceMetric.DOT_PRODUCT,
         description="Distance metric used to compute the distance between vectors.",
     )
-    pods: int = Field(
-        default=1,
-        le=2,
-        ge=1,
-        description="Number of pods to use for the index.",
-    )
-    replicas: int = Field(
-        default=1,
-        le=1,
-        ge=1,
-        description="Number of replicas to use for the index.",
-    )
-    pod_instance_type: PodType = Field(
-        default=PodType.S1,
-        description="Type of pod to use for the index. (https://docs.pinecone.io/docs/indexes)",
-    )
-    pod_size: PodSize = Field(
-        default=PodSize.X1,
-        description="Size of pod to use for the index. (https://docs.pinecone.io/docs/indexes)",
-    )
-    metadata_config: Optional[MetaDataConfig] = Field(
-        default=None,
-        description="Metadata configuration for the index.",
-    )
-    source_collection: str = Field(
-        default="",
-        description="Name of the source collection to use for the index.",
+    removal_policy: RemovalPolicy = Field(
+        default=RemovalPolicy.RETAIN,
+        description="The removal policy for the Pinecone indexes.",
     )

@@ -41,13 +41,13 @@ type LambdaConfig = {
 }
 
 // Enums converted to TypeScript
-export enum PodType {
+export enum PodInstanceType {
   S1 = 's1',
   P1 = 'p1',
   P2 = 'p2',
 }
 
-export enum PodSize {
+export enum PodInstanceSize {
   X1 = 'x1',
   X2 = 'x2',
   X4 = 'x4',
@@ -79,6 +79,14 @@ export enum PineConeEnvironment {
   AZURE_STD_EAST_US = 'eastus-azure',
 }
 
+export enum CloudProvider {
+  AWS = 'aws',
+}
+
+export enum Region {
+  US_WEST_2 = 'us-west-2',
+}
+
 const MAX_INDEX_NAME_LENGTH = 45;
 
 // Type converted from MetaDataConfig TypedDict
@@ -86,29 +94,28 @@ export interface MetaDataConfig {
   readonly indexed: string[];
 };
 
+export interface PodSpec {
+  readonly environment: PineConeEnvironment;
+  readonly numReplicas?: number;
+  readonly shards?: number;
+  readonly numPods?: number;
+  readonly podInstanceType?: PodInstanceType;
+  readonly podInstanceSize?: PodInstanceSize;
+  readonly metaDataConfig?: MetaDataConfig;
+}
+
+export interface ServerlessSpec {
+  readonly cloudProvider: CloudProvider;
+  readonly region: Region;
+};
+
 export interface PineconeIndexSettings {
   readonly apiKeySecretName: string;
-  readonly environment: PineConeEnvironment;
   readonly dimension: number;
+  readonly podSpec: PodSpec | ServerlessSpec;
   readonly name?: string;
   readonly removalPolicy?: RemovalPolicy;
   readonly metric?: DistanceMetric;
-  readonly pods?: number;
-  readonly replicas?: number;
-  readonly podInstanceType?: PodType;
-  readonly podSize?: PodSize;
-  readonly metadataConfig?: MetaDataConfig;
-  readonly sourceCollection?: string;
-};
-
-const DEFAULT_PINECONE_INDEX_SETTINGS: Omit<PineconeIndexSettings, 'apiKeySecretName' | 'environment' | 'dimension'> = {
-  removalPolicy: RemovalPolicy.RETAIN,
-  metric: DistanceMetric.DOT_PRODUCT,
-  pods: 1,
-  replicas: 1,
-  podInstanceType: PodType.S1,
-  podSize: PodSize.X1,
-  sourceCollection: '',
 };
 
 export interface PineconeIndexProps {
@@ -129,13 +136,6 @@ export class PineconeIndex extends Construct {
     super(scope, id);
     this.stackName = Stack.of(this).stackName;
     let { indexSettings, deploymentSettings = {} } = props;
-    indexSettings = indexSettings.map(indexSetting => {
-      indexSetting = {
-        ...DEFAULT_PINECONE_INDEX_SETTINGS,
-        ...indexSetting,
-      };
-      return indexSetting;
-    });
 
     deploymentSettings = {
       ...DEFAULT_DEPLOYMENT_SETTINGS,
@@ -183,7 +183,7 @@ export class PineconeIndex extends Construct {
         properties: properties,
       });
 
-      new CfnOutput(this, `${indexSetting.name}IndexName`, {
+      new CfnOutput(this, `Index${index}Name`, {
         value: properties.name,
         description: `Name of the '${indexSetting.name}' Pinecone index.`,
       });
@@ -205,7 +205,6 @@ export class PineconeIndex extends Construct {
       ephemeralStorageSize = Size.mebibytes(512),
     } = config;
 
-    // Create the Lambda function with the provided configuration.
     const dumpedEnv = this.dumpToEnv(environment);
     const lambda_func = new python_lambda.PythonFunction(
       this,
@@ -255,8 +254,8 @@ export class PineconeIndex extends Construct {
     return this.serializeEnv(this.convertCamelToEnvVarName(env));
   }
 
-  private serializeEnv(env: { [key: string]: any }): { [key: string]: string } {
-    let serializedEnv: { [key: string]: string } = {};
+  private serializeEnv(env: { [key: string]: any }): { [key: string]: any } {
+    let serializedEnv: { [key: string]: any } = {};
     for (let key in env) {
       if (typeof env[key] === 'string') {
         serializedEnv[key] = env[key];

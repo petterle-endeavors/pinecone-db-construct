@@ -1,5 +1,7 @@
 """Define the lambda function for initializing the Pinecone database."""
 import copy
+from json import JSONDecodeError
+import json
 import logging
 from typing import Any, Dict, Union
 from crhelper import CfnResource, FAILED
@@ -60,10 +62,22 @@ def delete(event: Dict[str, Any], context: LambdaContext) -> Union[bool, str, No
     index.delete()
 
 
+def deserialize_fields(obj: Dict[str, Any]) -> Dict[str, Any]:
+    """Deserialize the event."""
+    for key, value in obj.items():
+        try:
+            obj[key] = json.loads(value)
+        except JSONDecodeError:
+            obj[key] = value
+    return obj
+
+
 def lambda_handler(event: dict, context: LambdaContext):
     """Handle the lambda event."""
+    LOGGER.info("Received event: %s", event)
     assert SETTINGS is not None, "SETTINGS is None"
-    index_settings = PineconeIndexSettings.model_validate(event["ResourceProperties"])
+    props = deserialize_fields(event["ResourceProperties"])
+    index_settings = PineconeIndexSettings.model_validate(props)
     context.index = PineconeIndex(  # type: ignore
         settings=SETTINGS,
         index_settings=index_settings,

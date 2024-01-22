@@ -1,12 +1,22 @@
 """Define CUD operations for a pinecone index."""
 import copy
-from typing import Callable
+from typing import Callable, Union
 import time
 import logging
 import pinecone
+from pinecone import (
+    Pinecone,
+    PodSpec as PineconePodSpec,
+    ServerlessSpec as PineconeServerlessSpec,
+)
 from aws_lambda_powertools.utilities import parameters
 from .settings import Settings
-from .pinecone_settings import PineconeIndexSettings, RemovalPolicy
+from .pinecone_settings import (
+    PineconeIndexSettings,
+    RemovalPolicy,
+    PodSpec,
+    ServerlessSpec,
+)
 
 
 LOGGER = logging.getLogger(__name__)
@@ -29,9 +39,8 @@ class PineconeIndex:
         )
         assert isinstance(key, str), f"api_key of type '{type(key)}' returned from " \
             "secrets manager is not a string"
-        pinecone.init(
+        self._pinecone = Pinecone(
             api_key=key,
-            environment=index_settings.environment,
         )
 
     @property
@@ -40,9 +49,31 @@ class PineconeIndex:
         return self._index_settings.name
 
     @staticmethod
-    def get_pod_type(index_settings: PineconeIndexSettings) -> str:
+    def get_pod_type(spec: PodSpec) -> str:
         """Pod type is in the format s1.x1, so we need to split and get the first prefix (Example: s1)."""
-        return f"{index_settings.pod_instance_type}.{index_settings.pod_size}"
+        return f"{spec.pod_instance_type}.{spec.pod_instance_size}"
+
+    @classmethod
+    def to_pinecone_spec(
+        cls,
+        spec: Union[PodSpec, ServerlessSpec],
+    ) -> Union[PineconePodSpec, PineconeServerlessSpec]:
+        """Convert a pod spec to a dict."""
+        if isinstance(spec, PodSpec):
+            return PineconePodSpec(
+                environment=spec.environment,
+                replicas=spec.num_replicas,
+                shards=spec.shards,
+                pods=spec.num_pods,
+                pod_type=cls.get_pod_type(spec),
+                metadata_config=spec.metadata_config,  # type: ignore
+            )
+        elif isinstance(spec, ServerlessSpec):
+            return PineconeServerlessSpec(
+                cloud=spec.cloud_provider.value,
+                region=spec.region.value,
+            )
+        raise ValueError(f"Unsupported spec type: {type(spec)}")
 
     @property
     def settings(self) -> PineconeIndexSettings:
@@ -52,35 +83,50 @@ class PineconeIndex:
     def create(self) -> None:
         """Create a pinecone index."""
         settings = self._index_settings
+        self.validate_removal_policy(settings.removal_policy)
         self.run_operation_with_retry(
-            pinecone.create_index,
+            self._pinecone.create_index,
             name=settings.name,
             dimension=settings.dimension,
             metric=settings.metric,
-            pods=settings.pods,
-            replicas=settings.replicas,
-            pod_type=self.get_pod_type(settings),
-            metadata_config=settings.metadata_config,
-            source_collection=settings.source_collection,
+            # TODO: add async index creation and don't wait for creation
+            # timeout=settings.timeout,
+            spec=self.to_pinecone_spec(settings.pod_spec),
         )
 
     def update(self) -> None:
         """Update the pinecone index."""
         settings = self._index_settings
+        self.validate_removal_policy(settings.removal_policy)
+        spec = settings.pod_spec
         self._validate_update_operation()
-        self.run_operation_with_retry(
-            pinecone.configure_index,
-            name=settings.name,
-            replicas=settings.replicas,
-            pod_type=self.get_pod_type(settings),
-        )
+        if isinstance(spec, PodSpec):
+            self.run_operation_with_retry(
+                self._pinecone.configure_index,
+                name=settings.name,
+                replicas=spec.num_replicas,
+                pod_type=self.get_pod_type(spec),
+            )
 
     def delete(self) -> None:
         """Delete the pinecone index."""
         if self._can_delete_index():
             self.run_operation_with_retry(
-                pinecone.delete_index,
+                self._pinecone.delete_index,
                 name=self._index_settings.name,
+                # TODO: add async index creation and don't wait for deletion
+                # timeout=self._index_settings.timeout,
+            )
+
+    def validate_removal_policy(self, removal_policy: RemovalPolicy) -> None:
+        """Validate the removal policy."""
+        is_serverless = isinstance(self._index_settings.pod_spec, ServerlessSpec)
+        is_snapshot = removal_policy == RemovalPolicy.SNAPSHOT
+        if is_snapshot and is_serverless:
+            raise ValueError(
+                "Cannot use removal policy 'snapshot' for serverless indexes. " \
+                "Please use one of the following removal policies: " \
+                f"{[value for value in RemovalPolicy if value != RemovalPolicy.SNAPSHOT]}"
             )
 
     def run_operation_with_retry(self, operation: Callable, *args, **kwargs) -> None:
@@ -104,7 +150,8 @@ class PineconeIndex:
         index_name = self._index_settings.name
         removal_policy = self._index_settings.removal_policy
         try:
-            index = pinecone.Index(index_name)
+            index = self._pinecone.Index(index_name)
+            assert index is not None, f"Index '{index_name}' does not exist."
             stats = index.describe_index_stats()
         except Exception as error:  # pylint: disable=broad-except
             msg = f"Failed to get index stats for index '{index_name}'. Error: {error}"
@@ -125,21 +172,24 @@ class PineconeIndex:
 
     def _create_snapshot(self, index_name: str) -> None:
         self.run_operation_with_retry(
-            pinecone.create_collection,
-            name=f"{index_name}_snapshot",
+            self._pinecone.create_collection,
+            name=f"{index_name}-snapshot",
             source=index_name,
         )
 
     def _validate_update_operation(self) -> None:
-        index_settings = self._index_settings
-        pod_type = pinecone.describe_index(index_settings.name).pod_type
+        pod_spec = self._index_settings.pod_spec
+        if isinstance(pod_spec, ServerlessSpec):
+            return
+        description = self._pinecone.describe_index(self._index_settings.name)
+        pod_type = description["spec"]["pod"]["pod_type"]
         LOGGER.info("Current pod type: '%s'", pod_type)
         current_pod_instance_type, current_pod_size = pod_type.split(".")
-        new_pod_size = index_settings.pod_size
+        new_pod_size = pod_spec.pod_instance_size
         assert (
             current_pod_size <= new_pod_size
         ), f"Cannot downgrade pod size. Current pod size: '{current_pod_size}', new pod size: '{new_pod_size}'"
-        new_pod_instance_type = index_settings.pod_instance_type
+        new_pod_instance_type = pod_spec.pod_instance_type
         assert (
             current_pod_instance_type == new_pod_instance_type
         ), f"Cannot change pod type. Current pod type: '{current_pod_instance_type}', new pod type: '{new_pod_instance_type}'"

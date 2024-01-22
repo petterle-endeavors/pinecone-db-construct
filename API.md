@@ -225,16 +225,10 @@ const pineconeIndexSettings: PineconeIndexSettings = { ... }
 | --- | --- | --- |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.apiKeySecretName">apiKeySecretName</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.dimension">dimension</a></code> | <code>number</code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.environment">environment</a></code> | <code><a href="#pinecone-db-construct.PineConeEnvironment">PineConeEnvironment</a></code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.metadataConfig">metadataConfig</a></code> | <code><a href="#pinecone-db-construct.MetaDataConfig">MetaDataConfig</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.podSpec">podSpec</a></code> | <code><a href="#pinecone-db-construct.PodSpec">PodSpec</a> \| <a href="#pinecone-db-construct.ServerlessSpec">ServerlessSpec</a></code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.metric">metric</a></code> | <code><a href="#pinecone-db-construct.DistanceMetric">DistanceMetric</a></code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.name">name</a></code> | <code>string</code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.podInstanceType">podInstanceType</a></code> | <code><a href="#pinecone-db-construct.PodType">PodType</a></code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.pods">pods</a></code> | <code>number</code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.podSize">podSize</a></code> | <code><a href="#pinecone-db-construct.PodSize">PodSize</a></code> | *No description.* |
 | <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.removalPolicy">removalPolicy</a></code> | <code>aws-cdk-lib.RemovalPolicy</code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.replicas">replicas</a></code> | <code>number</code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PineconeIndexSettings.property.sourceCollection">sourceCollection</a></code> | <code>string</code> | *No description.* |
 
 ---
 
@@ -258,23 +252,13 @@ public readonly dimension: number;
 
 ---
 
-##### `environment`<sup>Required</sup> <a name="environment" id="pinecone-db-construct.PineconeIndexSettings.property.environment"></a>
+##### `podSpec`<sup>Required</sup> <a name="podSpec" id="pinecone-db-construct.PineconeIndexSettings.property.podSpec"></a>
 
 ```typescript
-public readonly environment: PineConeEnvironment;
+public readonly podSpec: PodSpec | ServerlessSpec;
 ```
 
-- *Type:* <a href="#pinecone-db-construct.PineConeEnvironment">PineConeEnvironment</a>
-
----
-
-##### `metadataConfig`<sup>Optional</sup> <a name="metadataConfig" id="pinecone-db-construct.PineconeIndexSettings.property.metadataConfig"></a>
-
-```typescript
-public readonly metadataConfig: MetaDataConfig;
-```
-
-- *Type:* <a href="#pinecone-db-construct.MetaDataConfig">MetaDataConfig</a>
+- *Type:* <a href="#pinecone-db-construct.PodSpec">PodSpec</a> | <a href="#pinecone-db-construct.ServerlessSpec">ServerlessSpec</a>
 
 ---
 
@@ -298,36 +282,6 @@ public readonly name: string;
 
 ---
 
-##### `podInstanceType`<sup>Optional</sup> <a name="podInstanceType" id="pinecone-db-construct.PineconeIndexSettings.property.podInstanceType"></a>
-
-```typescript
-public readonly podInstanceType: PodType;
-```
-
-- *Type:* <a href="#pinecone-db-construct.PodType">PodType</a>
-
----
-
-##### `pods`<sup>Optional</sup> <a name="pods" id="pinecone-db-construct.PineconeIndexSettings.property.pods"></a>
-
-```typescript
-public readonly pods: number;
-```
-
-- *Type:* number
-
----
-
-##### `podSize`<sup>Optional</sup> <a name="podSize" id="pinecone-db-construct.PineconeIndexSettings.property.podSize"></a>
-
-```typescript
-public readonly podSize: PodSize;
-```
-
-- *Type:* <a href="#pinecone-db-construct.PodSize">PodSize</a>
-
----
-
 ##### `removalPolicy`<sup>Optional</sup> <a name="removalPolicy" id="pinecone-db-construct.PineconeIndexSettings.property.removalPolicy"></a>
 
 ```typescript
@@ -338,29 +292,157 @@ public readonly removalPolicy: RemovalPolicy;
 
 ---
 
-##### `replicas`<sup>Optional</sup> <a name="replicas" id="pinecone-db-construct.PineconeIndexSettings.property.replicas"></a>
+### PodSpec <a name="PodSpec" id="pinecone-db-construct.PodSpec"></a>
+
+#### Initializer <a name="Initializer" id="pinecone-db-construct.PodSpec.Initializer"></a>
 
 ```typescript
-public readonly replicas: number;
+import { PodSpec } from 'pinecone-db-construct'
+
+const podSpec: PodSpec = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#pinecone-db-construct.PodSpec.property.environment">environment</a></code> | <code><a href="#pinecone-db-construct.PineConeEnvironment">PineConeEnvironment</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodSpec.property.metaDataConfig">metaDataConfig</a></code> | <code><a href="#pinecone-db-construct.MetaDataConfig">MetaDataConfig</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodSpec.property.numPods">numPods</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodSpec.property.numReplicas">numReplicas</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodSpec.property.podInstanceSize">podInstanceSize</a></code> | <code><a href="#pinecone-db-construct.PodInstanceSize">PodInstanceSize</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodSpec.property.podInstanceType">podInstanceType</a></code> | <code><a href="#pinecone-db-construct.PodInstanceType">PodInstanceType</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodSpec.property.shards">shards</a></code> | <code>number</code> | *No description.* |
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="pinecone-db-construct.PodSpec.property.environment"></a>
+
+```typescript
+public readonly environment: PineConeEnvironment;
+```
+
+- *Type:* <a href="#pinecone-db-construct.PineConeEnvironment">PineConeEnvironment</a>
+
+---
+
+##### `metaDataConfig`<sup>Optional</sup> <a name="metaDataConfig" id="pinecone-db-construct.PodSpec.property.metaDataConfig"></a>
+
+```typescript
+public readonly metaDataConfig: MetaDataConfig;
+```
+
+- *Type:* <a href="#pinecone-db-construct.MetaDataConfig">MetaDataConfig</a>
+
+---
+
+##### `numPods`<sup>Optional</sup> <a name="numPods" id="pinecone-db-construct.PodSpec.property.numPods"></a>
+
+```typescript
+public readonly numPods: number;
 ```
 
 - *Type:* number
 
 ---
 
-##### `sourceCollection`<sup>Optional</sup> <a name="sourceCollection" id="pinecone-db-construct.PineconeIndexSettings.property.sourceCollection"></a>
+##### `numReplicas`<sup>Optional</sup> <a name="numReplicas" id="pinecone-db-construct.PodSpec.property.numReplicas"></a>
 
 ```typescript
-public readonly sourceCollection: string;
+public readonly numReplicas: number;
 ```
 
-- *Type:* string
+- *Type:* number
+
+---
+
+##### `podInstanceSize`<sup>Optional</sup> <a name="podInstanceSize" id="pinecone-db-construct.PodSpec.property.podInstanceSize"></a>
+
+```typescript
+public readonly podInstanceSize: PodInstanceSize;
+```
+
+- *Type:* <a href="#pinecone-db-construct.PodInstanceSize">PodInstanceSize</a>
+
+---
+
+##### `podInstanceType`<sup>Optional</sup> <a name="podInstanceType" id="pinecone-db-construct.PodSpec.property.podInstanceType"></a>
+
+```typescript
+public readonly podInstanceType: PodInstanceType;
+```
+
+- *Type:* <a href="#pinecone-db-construct.PodInstanceType">PodInstanceType</a>
+
+---
+
+##### `shards`<sup>Optional</sup> <a name="shards" id="pinecone-db-construct.PodSpec.property.shards"></a>
+
+```typescript
+public readonly shards: number;
+```
+
+- *Type:* number
+
+---
+
+### ServerlessSpec <a name="ServerlessSpec" id="pinecone-db-construct.ServerlessSpec"></a>
+
+#### Initializer <a name="Initializer" id="pinecone-db-construct.ServerlessSpec.Initializer"></a>
+
+```typescript
+import { ServerlessSpec } from 'pinecone-db-construct'
+
+const serverlessSpec: ServerlessSpec = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#pinecone-db-construct.ServerlessSpec.property.cloudProvider">cloudProvider</a></code> | <code><a href="#pinecone-db-construct.CloudProvider">CloudProvider</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.ServerlessSpec.property.region">region</a></code> | <code><a href="#pinecone-db-construct.Region">Region</a></code> | *No description.* |
+
+---
+
+##### `cloudProvider`<sup>Required</sup> <a name="cloudProvider" id="pinecone-db-construct.ServerlessSpec.property.cloudProvider"></a>
+
+```typescript
+public readonly cloudProvider: CloudProvider;
+```
+
+- *Type:* <a href="#pinecone-db-construct.CloudProvider">CloudProvider</a>
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="pinecone-db-construct.ServerlessSpec.property.region"></a>
+
+```typescript
+public readonly region: Region;
+```
+
+- *Type:* <a href="#pinecone-db-construct.Region">Region</a>
 
 ---
 
 
 
 ## Enums <a name="Enums" id="Enums"></a>
+
+### CloudProvider <a name="CloudProvider" id="pinecone-db-construct.CloudProvider"></a>
+
+#### Members <a name="Members" id="Members"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#pinecone-db-construct.CloudProvider.AWS">AWS</a></code> | *No description.* |
+
+---
+
+##### `AWS` <a name="AWS" id="pinecone-db-construct.CloudProvider.AWS"></a>
+
+---
+
 
 ### DistanceMetric <a name="DistanceMetric" id="pinecone-db-construct.DistanceMetric"></a>
 
@@ -494,62 +576,77 @@ public readonly sourceCollection: string;
 ---
 
 
-### PodSize <a name="PodSize" id="pinecone-db-construct.PodSize"></a>
+### PodInstanceSize <a name="PodInstanceSize" id="pinecone-db-construct.PodInstanceSize"></a>
 
 #### Members <a name="Members" id="Members"></a>
 
 | **Name** | **Description** |
 | --- | --- |
-| <code><a href="#pinecone-db-construct.PodSize.X1">X1</a></code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PodSize.X2">X2</a></code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PodSize.X4">X4</a></code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PodSize.X8">X8</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodInstanceSize.X1">X1</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodInstanceSize.X2">X2</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodInstanceSize.X4">X4</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodInstanceSize.X8">X8</a></code> | *No description.* |
 
 ---
 
-##### `X1` <a name="X1" id="pinecone-db-construct.PodSize.X1"></a>
-
----
-
-
-##### `X2` <a name="X2" id="pinecone-db-construct.PodSize.X2"></a>
+##### `X1` <a name="X1" id="pinecone-db-construct.PodInstanceSize.X1"></a>
 
 ---
 
 
-##### `X4` <a name="X4" id="pinecone-db-construct.PodSize.X4"></a>
+##### `X2` <a name="X2" id="pinecone-db-construct.PodInstanceSize.X2"></a>
 
 ---
 
 
-##### `X8` <a name="X8" id="pinecone-db-construct.PodSize.X8"></a>
+##### `X4` <a name="X4" id="pinecone-db-construct.PodInstanceSize.X4"></a>
 
 ---
 
 
-### PodType <a name="PodType" id="pinecone-db-construct.PodType"></a>
+##### `X8` <a name="X8" id="pinecone-db-construct.PodInstanceSize.X8"></a>
+
+---
+
+
+### PodInstanceType <a name="PodInstanceType" id="pinecone-db-construct.PodInstanceType"></a>
 
 #### Members <a name="Members" id="Members"></a>
 
 | **Name** | **Description** |
 | --- | --- |
-| <code><a href="#pinecone-db-construct.PodType.S1">S1</a></code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PodType.P1">P1</a></code> | *No description.* |
-| <code><a href="#pinecone-db-construct.PodType.P2">P2</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodInstanceType.S1">S1</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodInstanceType.P1">P1</a></code> | *No description.* |
+| <code><a href="#pinecone-db-construct.PodInstanceType.P2">P2</a></code> | *No description.* |
 
 ---
 
-##### `S1` <a name="S1" id="pinecone-db-construct.PodType.S1"></a>
-
----
-
-
-##### `P1` <a name="P1" id="pinecone-db-construct.PodType.P1"></a>
+##### `S1` <a name="S1" id="pinecone-db-construct.PodInstanceType.S1"></a>
 
 ---
 
 
-##### `P2` <a name="P2" id="pinecone-db-construct.PodType.P2"></a>
+##### `P1` <a name="P1" id="pinecone-db-construct.PodInstanceType.P1"></a>
+
+---
+
+
+##### `P2` <a name="P2" id="pinecone-db-construct.PodInstanceType.P2"></a>
+
+---
+
+
+### Region <a name="Region" id="pinecone-db-construct.Region"></a>
+
+#### Members <a name="Members" id="Members"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#pinecone-db-construct.Region.US_WEST_2">US_WEST_2</a></code> | *No description.* |
+
+---
+
+##### `US_WEST_2` <a name="US_WEST_2" id="pinecone-db-construct.Region.US_WEST_2"></a>
 
 ---
 
