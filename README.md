@@ -84,20 +84,20 @@ from aws_cdk import (
     App,
     RemovalPolicy,
     Stack,
-    StackProps
 )
 from pinecone_db_construct import (
     PineconeIndex,
-    PineConeEnvironment,
+    CloudProvider,
+    Region,
     PineconeIndexSettings,
-    PodSpec,
+    ServerlessSpec,
     DeploymentSettings,
-)
+)s
   
 
 class MyStack(Stack):
-    def __init__(self, scope: Construct, id: str, props: StackProps = None):
-        super().__init__(scope, id, props)
+    def __init__(self, scope: Construct, id: str, **kwargs) -> None:
+        super().__init__(scope, id, **kwargs)
 
         PineconeIndex(
             self,
@@ -107,9 +107,9 @@ class MyStack(Stack):
                     api_key_secret_name='pinecone-test',
                     dimension=128,
                     removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
-                    pod_spec=PodSpec(
-                        cloud_provider=PineConeEnvironment.AWS,
-                        region='us-west-2',
+                    pod_spec=ServerlessSpec(
+                        cloud_provider=CloudProvider.AWS,
+                        region=Region.US_WEST_2,
                     ),
                 ),
             ],
