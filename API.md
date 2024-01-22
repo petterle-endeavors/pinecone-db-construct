@@ -118,7 +118,7 @@ const deploymentSettings: DeploymentSettings = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#pinecone-db-construct.DeploymentSettings.property.deploymentArchitecture">deploymentArchitecture</a></code> | <code>aws-cdk-lib.aws_lambda.Architecture</code> | *No description.* |
-| <code><a href="#pinecone-db-construct.DeploymentSettings.property.numAttemptsToRetryOperation">numAttemptsToRetryOperation</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#pinecone-db-construct.DeploymentSettings.property.maxNumAttempts">maxNumAttempts</a></code> | <code>number</code> | *No description.* |
 
 ---
 
@@ -132,10 +132,10 @@ public readonly deploymentArchitecture: Architecture;
 
 ---
 
-##### `numAttemptsToRetryOperation`<sup>Optional</sup> <a name="numAttemptsToRetryOperation" id="pinecone-db-construct.DeploymentSettings.property.numAttemptsToRetryOperation"></a>
+##### `maxNumAttempts`<sup>Optional</sup> <a name="maxNumAttempts" id="pinecone-db-construct.DeploymentSettings.property.maxNumAttempts"></a>
 
 ```typescript
-public readonly numAttemptsToRetryOperation: number;
+public readonly maxNumAttempts: number;
 ```
 
 - *Type:* number

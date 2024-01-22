@@ -53,12 +53,14 @@ class MyStack extends Stack {
       {
         indexSettings: [{
           apiKeySecretName: 'pinecone-test',
-          environment: PineConeEnvironment.GCP_STARTER,
           dimension: 128,
-          removalPolicy: RemovalPolicy.SNAPSHOT,
+          removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+          podSpec: {
+            environment: PineConeEnvironment.GCP_STARTER,
+          },
         }],
-        customResourceSettings: {
-          numAttemptsToRetryOperation: 2,
+        deploymentSettings: {
+          maxNumAttempts: 2,
         },
       },
     );
@@ -77,14 +79,21 @@ APP.synth();
 For CDK applications written in Python, you can use the construct as shown:
 
 ```python
+from constructs import Construct
 from aws_cdk import (
     App,
     RemovalPolicy,
     Stack,
     StackProps
 )
-from constructs import Construct
-from pinecone_db_construct import PineconeIndex, PineConeEnvironment  # Assuming these exist in the ../index file relative to this file
+from pinecone_db_construct import (
+    PineconeIndex,
+    PineConeEnvironment,
+    PineconeIndexSettings,
+    PodSpec,
+    DeploymentSettings,
+)
+  
 
 class MyStack(Stack):
     def __init__(self, scope: Construct, id: str, props: StackProps = None):
@@ -93,15 +102,20 @@ class MyStack(Stack):
         PineconeIndex(
             self,
             'PineconeIndex',
-            index_settings=[{
-                'api_key_secret_name': 'pinecone-test',
-                'environment': PineConeEnvironment.GCP_STARTER,
-                'dimension': 128,
-                'removal_policy': RemovalPolicy.SNAPSHOT,
-            }],
-            custom_resource_settings={
-                'num_attempts_to_retry_operation': 2,
-            }
+            index_settings=[
+                PineconeIndexSettings(
+                    api_key_secret_name='pinecone-test',
+                    dimension=128,
+                    removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+                    pod_spec=PodSpec(
+                        cloud_provider=PineConeEnvironment.AWS,
+                        region='us-west-2',
+                    ),
+                ),
+            ],
+            deployment_settings=DeploymentSettings(
+                max_num_attempts=2,
+            ),
         )
 
 APP = App()
@@ -136,4 +150,4 @@ If running the default ARM deployment architecture and deploying on an x86_64 ma
 
 ## Contributing
 
-We welcome contributions, feedback, and bug reports. Before you contribute, please read our [contributing guidelines](CONTRIBUTING.md).
+I'd love if you wanted to contribute, provide feedback, and/or report bugs. Before you contribute, please read the [contributing guidelines](CONTRIBUTING.md).

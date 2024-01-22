@@ -1,5 +1,6 @@
 """Define the lambda function for initializing the Pinecone database."""
 import copy
+import os
 from json import JSONDecodeError
 import json
 import logging
@@ -20,9 +21,8 @@ helper = CfnResource(
     # polling_interval=1,
 )
 
-SETTINGS: Union[Settings, None] = None
 try:
-    SETTINGS = Settings()  # type: ignore
+    pass
 except Exception as error:  # pylint: disable=broad-except
     helper.init_failure(error)
 
@@ -39,7 +39,6 @@ def create(_: Dict[str, Any], context: LambdaContext) -> Union[bool, str, None]:
 @helper.update
 def update(event: Dict[str, Any], context: LambdaContext) -> Union[bool, str, None]:
     """Update the Pinecone database."""
-    assert SETTINGS is not None, "SETTINGS is None"
     index: PineconeIndex = context.index # type: ignore
     resource_id = event.get("PhysicalResourceId")
     assert (
@@ -52,7 +51,6 @@ def update(event: Dict[str, Any], context: LambdaContext) -> Union[bool, str, No
 @helper.delete
 def delete(event: Dict[str, Any], context: LambdaContext) -> Union[bool, str, None]:
     """Delete the Pinecone database."""
-    assert SETTINGS is not None, "SETTINGS is None"
     index: PineconeIndex = context.index # type: ignore
     resource_id = event.get("PhysicalResourceId")
     assert (
@@ -75,11 +73,11 @@ def deserialize_fields(obj: Dict[str, Any]) -> Dict[str, Any]:
 def lambda_handler(event: dict, context: LambdaContext):
     """Handle the lambda event."""
     LOGGER.info("Received event: %s", event)
-    assert SETTINGS is not None, "SETTINGS is None"
+    settings = Settings()  # type: ignore
     props = deserialize_fields(event["ResourceProperties"])
     index_settings = PineconeIndexSettings.model_validate(props)
     context.index = PineconeIndex(  # type: ignore
-        settings=SETTINGS,
+        settings=settings,
         index_settings=index_settings,
     )
     helper(event, context)
