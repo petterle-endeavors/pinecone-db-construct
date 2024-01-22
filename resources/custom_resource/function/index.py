@@ -76,6 +76,7 @@ def lambda_handler(event: dict, context: LambdaContext):
     """Handle the lambda event."""
     LOGGER.info("Received event: %s", event)
     assert SETTINGS is not None, "SETTINGS is None"
+    LOGGER.info("SETTINGS: %s", SETTINGS)
     props = deserialize_fields(event["ResourceProperties"])
     index_settings = PineconeIndexSettings.model_validate(props)
     context.index = PineconeIndex(  # type: ignore

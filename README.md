@@ -60,7 +60,7 @@ class MyStack extends Stack {
           },
         }],
         deploymentSettings: {
-          numAttemptsToRetryOperation: 2,
+          maxNumberOfAttempts: 2,
         },
       },
     );
@@ -114,7 +114,7 @@ class MyStack(Stack):
                 ),
             ],
             deployment_settings=DeploymentSettings(
-                num_attempts_to_retry_operation=2,
+                max_num_attempts=2,
             ),
         )
 

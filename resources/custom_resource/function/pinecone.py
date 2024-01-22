@@ -131,7 +131,7 @@ class PineconeIndex:
 
     def run_operation_with_retry(self, operation: Callable, *args, **kwargs) -> None:
         """Run an operation with retries."""
-        num_attempts = self._settings.num_attempts_to_run_operation
+        num_attempts = self._settings.max_num_attempts
         delay_between_attempts = 5
         for attempt in range(num_attempts):
             try:
