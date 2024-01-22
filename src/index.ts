@@ -25,7 +25,7 @@ export interface DeploymentSettings {
 
 const DEFAULT_DEPLOYMENT_SETTINGS: DeploymentSettings = {
   numAttemptsToRetryOperation: 3,
-  deploymentArchitecture: lambda.Architecture.ARM_64,
+  deploymentArchitecture: lambda.Architecture.X86_64,
 };
 
 type LambdaConfig = {
