@@ -52,7 +52,7 @@ class MyStack extends Stack {
       'PineconeIndex',
       {
         indexSettings: [{
-          apiKeySecretName: 'pinecone-test',
+          apiKeySecretName: 'pinecone-test',  // store as a string in secrets manager, NOT a key/value secret
           dimension: 128,
           removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
           // Pod Index (see python example for serverless)
@@ -105,7 +105,7 @@ class MyStack(Stack):
             'PineconeIndex',
             index_settings=[
                 PineconeIndexSettings(
-                    api_key_secret_name='pinecone-test',
+                    api_key_secret_name='pinecone-test',  # store as a string in secrets manager, NOT a key/value secret
                     dimension=128,
                     removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
                     # Serverless Index (see typescript example for Pod)
